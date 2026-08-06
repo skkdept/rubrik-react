@@ -118,6 +118,49 @@ function loginPage({ error } = {}) {
 </html>`
 }
 
+// Decoy page shown at "/". It never checks or submits anything — the real
+// gate lives at BASE_PATH/login. This just keeps a casual visitor to the
+// bare domain from seeing anything indicating where the real app is.
+function decoyPage() {
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Sign in</title>
+<style>
+  body {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #ffffff; color: #111111;
+  }
+  .card {
+    display: flex; flex-direction: column; gap: 12px;
+    width: 280px; padding: 32px;
+  }
+  h1 { margin: 0 0 4px; font-size: 18px; }
+  input {
+    padding: 10px 12px; border-radius: 8px; border: 1px solid #ccc;
+    background: #ffffff; color: #111111; font-size: 14px;
+  }
+  button {
+    padding: 10px 12px; border-radius: 8px; border: none;
+    background: #ff6a13; color: #ffffff; font-weight: 600; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>Sign in</h1>
+    <input type="password" name="password" placeholder="Password" autocomplete="off" />
+    <button type="button">Enter</button>
+  </div>
+</body>
+</html>`
+}
+
 // Served at /rubrik to match vite.config.ts's `base`, which prefixes every
 // built asset URL the same way.
 const BASE_PATH = '/rubrik'
@@ -127,7 +170,7 @@ app.disable('x-powered-by')
 app.set('trust proxy', 1)
 app.use(express.urlencoded({ extended: false }))
 
-app.get('/', (req, res) => res.redirect(BASE_PATH))
+app.get('/', (req, res) => res.type('html').send(decoyPage()))
 
 const siteRouter = express.Router()
 
