@@ -108,7 +108,7 @@ function loginPage({ error } = {}) {
 </style>
 </head>
 <body>
-  <form method="POST" action="/login">
+  <form method="POST" action="${BASE_PATH}/login">
     <h1>This site is password protected</h1>
     ${error ? `<p class="error">${error}</p>` : ''}
     <input type="password" name="password" placeholder="Password" autofocus required />
@@ -118,46 +118,56 @@ function loginPage({ error } = {}) {
 </html>`
 }
 
+// Served at /rubrik to match vite.config.ts's `base`, which prefixes every
+// built asset URL the same way.
+const BASE_PATH = '/rubrik'
+
 const app = express()
 app.disable('x-powered-by')
 app.set('trust proxy', 1)
 app.use(express.urlencoded({ extended: false }))
 
-app.get('/login', (req, res) => {
+app.get('/', (req, res) => res.redirect(BASE_PATH))
+
+const siteRouter = express.Router()
+
+siteRouter.get('/login', (req, res) => {
   const cookies = parseCookies(req.headers.cookie)
   if (isValidToken(cookies[COOKIE_NAME])) {
-    return res.redirect('/')
+    return res.redirect(BASE_PATH)
   }
   res.type('html').send(loginPage())
 })
 
-app.post('/login', (req, res) => {
+siteRouter.post('/login', (req, res) => {
   if (isCorrectPassword(req.body?.password)) {
     const token = issueToken()
     res.setHeader('Set-Cookie', [
       `${COOKIE_NAME}=${encodeURIComponent(token)}`,
       'HttpOnly',
-      'Path=/',
+      `Path=${BASE_PATH}`,
       `Max-Age=${Math.floor(SESSION_TTL_MS / 1000)}`,
       'SameSite=Lax',
       ...(isProduction ? ['Secure'] : []),
     ].join('; '))
-    return res.redirect('/')
+    return res.redirect(BASE_PATH)
   }
   res.status(401).type('html').send(loginPage({ error: 'Incorrect password.' }))
 })
 
-app.use((req, res, next) => {
+siteRouter.use((req, res, next) => {
   const cookies = parseCookies(req.headers.cookie)
   if (isValidToken(cookies[COOKIE_NAME])) return next()
-  res.redirect('/login')
+  res.redirect(`${BASE_PATH}/login`)
 })
 
-app.use(express.static(DIST_DIR))
+siteRouter.use(express.static(DIST_DIR))
 
-app.get('/*splat', (req, res) => {
+siteRouter.get('/*splat', (req, res) => {
   res.sendFile(path.join(DIST_DIR, 'index.html'))
 })
+
+app.use(BASE_PATH, siteRouter)
 
 const port = process.env.PORT || 3000
 app.listen(port, () => {

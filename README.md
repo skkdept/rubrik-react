@@ -8,6 +8,10 @@ This branch adds `server.js`, an Express server that serves the built app behind
 password gate, for use as a Railway preview deployment. The password is validated
 server-side and lives in an environment variable — there is no database.
 
+The app is served under the `/rubrik` subpath (e.g. `your-app.up.railway.app/rubrik`),
+not at the root — `/` just redirects there. This is set via `base` in `vite.config.ts`
+(so built asset URLs carry the prefix) and mirrored in `server.js`'s routing.
+
 Required Railway service variables:
 
 - `SITE_PASSWORD` — the password visitors must enter.

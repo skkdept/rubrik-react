@@ -3,6 +3,10 @@ import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
+  // The Railway deployment serves this app behind server.js at the /rubrik
+  // subpath (see server.js), so built asset URLs need that prefix. The dev
+  // server keeps serving from / for a normal local `npm run dev` experience.
+  base: mode === 'production' ? '/rubrik/' : '/',
   plugins: [react()],
   css: {
     modules: {
