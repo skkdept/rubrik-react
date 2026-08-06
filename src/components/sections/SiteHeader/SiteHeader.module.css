@@ -1,0 +1,131 @@
+.header {
+  position: relative;
+  width: 100%;
+  background: var(--semantic-color-bg-surface);
+  border-bottom: 1px solid var(--semantic-color-border-default);
+}
+
+/* This specific button comes from the raw generated Nav markup (not a
+   hand-written component), which — like every other "FK Grotesk Mono"
+   declaration in that same generated file — falls back to the generic
+   `sans-serif` keyword, not `monospace`. The hand-written components
+   (FaqSection, TestimonialCarousel, PlatformSurfaces tabs) use the correct
+   `monospace` fallback for the same font and are unaffected — this override
+   is scoped to just this one instance rather than changing the shared
+   `--primitive-font-family-mono` token, which would wrongly flip those
+   too. See ASSUMPTIONS.md. */
+.navCta {
+  font-family: "FK Grotesk Mono", sans-serif;
+}
+
+/* The nav uses its own fixed 24px horizontal padding and 83px height at
+   every breakpoint, per source — distinct from the 16/32/64px page margin
+   the rest of the page uses (Container), not a version of it. */
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--primitive-spacing-6);
+  width: 100%;
+  max-width: var(--semantic-layout-page-width);
+  height: 5.1875rem; /* 83px, per source */
+  margin-inline: auto;
+  padding-inline: 1.5rem; /* 24px, per source */
+}
+
+/* Two anchored groups (logo+primary links / secondary links+CTA) with a
+   deliberate gap between them, per source — not one evenly-distributed row.
+   `justify-content: space-between` on 2 children pins them to opposite
+   ends; adding a 3rd top-level child here would center it instead. */
+.primaryGroup,
+.secondaryGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--primitive-spacing-4); /* 16px, per source — uniform with navList's own link gap */
+  flex-shrink: 0;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  color: var(--semantic-color-fg-primary);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.logotype {
+  width: 7.409rem; /* 118.55px, per source */
+  height: auto;
+}
+
+.navGroups {
+  display: none;
+  align-items: center;
+  gap: var(--primitive-spacing-7);
+}
+
+.navList {
+  display: flex;
+  align-items: center;
+  gap: var(--primitive-spacing-4); /* 16px, per source */
+}
+
+.navLink {
+  text-decoration: none;
+  color: var(--semantic-color-fg-secondary);
+  font-family: var(--semantic-font-functional);
+  font-size: var(--semantic-text-ui-nav-size);
+  font-weight: var(--semantic-text-ui-nav-weight);
+}
+
+.navLink:hover {
+  color: var(--semantic-color-fg-primary);
+}
+
+.menuToggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: var(--primitive-radius-md);
+}
+
+.menuToggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+.mobilePanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitive-spacing-6);
+  padding: var(--primitive-spacing-6) var(--primitive-spacing-4) var(--primitive-spacing-8);
+  border-top: 1px solid var(--semantic-color-border-default);
+}
+
+.mobileNavList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitive-spacing-4);
+}
+
+.mobileNavList .navLink {
+  font-size: var(--semantic-text-body-base-size);
+}
+
+@media (min-width: 1200px) {
+  .navGroups {
+    display: flex;
+  }
+
+  .menuToggle {
+    display: none;
+  }
+
+  .mobilePanel {
+    display: none;
+  }
+}

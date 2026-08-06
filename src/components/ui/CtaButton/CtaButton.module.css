@@ -1,0 +1,93 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--primitive-spacing-2);
+  border: 1px solid transparent;
+  font-family: var(--semantic-font-functional);
+  font-weight: var(--semantic-text-ui-button-weight);
+  line-height: var(--semantic-text-ui-button-line-height);
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color 200ms ease,
+    color 200ms ease,
+    border-color 200ms ease;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* ── Sizes ── */
+/* Radius is a SIZE property, not a variant one — checked every CTA Button
+   instance in the source (Nav, Hero, CTA banners, form buttons): every
+   ~33-37px-tall button is a full pill regardless of color, every
+   ~46-65px-tall button (Hero, CTA banners, both Primary- and
+   white/Secondary-colored) is sharp-cornered, also regardless of color.
+   Guidelines.md's "sharp corners" note under the Dark row and "full pill"
+   note under the Small row describe the same axis from two different
+   variants' points of view — there's no evidence any Medium/Large button
+   is ever rounded. See ASSUMPTIONS.md. */
+
+/* Large: primary page CTAs / hero. Guidelines.md: 24/14px padding, 16px font. */
+.large {
+  padding: 14px 24px;
+  font-size: 1rem; /* 16px */
+  border-radius: 0;
+}
+
+/* Medium: section/card actions. Guidelines.md: 20/12px padding, 14px font. */
+.medium {
+  padding: 12px 20px;
+  font-size: var(--semantic-text-ui-button-size); /* 14px */
+  border-radius: 0;
+}
+
+/* Small: inline actions/tags. Guidelines.md: 20/10px padding, 12px font, full pill, mono. */
+.small {
+  padding: 10px 20px;
+  font-size: var(--semantic-text-label-mono-size); /* 12px */
+  font-family: var(--semantic-font-label);
+  letter-spacing: var(--semantic-text-label-mono-letter-spacing);
+  text-transform: uppercase;
+  border-radius: var(--primitive-radius-full);
+}
+
+/* ── Variants — all AAA contrast pairs per Guidelines.md §4 ── */
+.primary {
+  background: var(--semantic-color-cta-primary-bg);
+  color: var(--semantic-color-cta-primary-fg);
+}
+.primary:hover:not(:disabled) {
+  background: var(--primitive-color-ink);
+}
+
+.secondary {
+  background: var(--semantic-color-cta-secondary-bg);
+  color: var(--semantic-color-cta-secondary-fg);
+  border-color: var(--semantic-color-cta-secondary-border);
+}
+.secondary:hover:not(:disabled) {
+  background: var(--semantic-color-bg-surface-teal-tint);
+}
+
+.accent {
+  background: var(--semantic-color-cta-accent-bg);
+  color: var(--semantic-color-cta-accent-fg);
+}
+.accent:hover:not(:disabled) {
+  background: var(--primitive-color-teal-light);
+}
+
+/* Dark: content-heavy/editorial sections. No radius here — it's controlled
+   entirely by size (see note above), not variant. */
+.dark {
+  background: var(--semantic-color-cta-dark-bg);
+  color: var(--semantic-color-cta-dark-fg);
+  text-transform: uppercase;
+}
+.dark:hover:not(:disabled) {
+  background: var(--primitive-color-text-secondary);
+}

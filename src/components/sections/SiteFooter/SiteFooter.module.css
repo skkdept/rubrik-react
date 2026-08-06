@@ -1,0 +1,142 @@
+.footer {
+  width: 100%;
+  background: var(--semantic-color-bg-surface-dark);
+  color: var(--semantic-color-fg-on-dark);
+  padding: var(--primitive-spacing-9) var(--primitive-spacing-4) var(--primitive-spacing-6);
+}
+
+@media (min-width: 1200px) {
+  .footer {
+    padding: 4.5rem var(--semantic-layout-margin) var(--primitive-spacing-7);
+  }
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--primitive-spacing-7) var(--primitive-spacing-4);
+}
+
+@media (min-width: 768px) {
+  .columns {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitive-spacing-4);
+}
+
+.columnHeading {
+  font-family: var(--semantic-font-label);
+  font-size: var(--semantic-text-label-mono-size);
+  letter-spacing: var(--semantic-text-label-mono-letter-spacing);
+  text-transform: uppercase;
+  color: var(--primitive-color-text-disabled);
+}
+
+.linkList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitive-spacing-3);
+}
+
+.link {
+  font-family: var(--semantic-font-functional);
+  font-size: var(--semantic-text-body-sm-size);
+  color: var(--semantic-color-fg-on-dark);
+  text-decoration: none;
+  opacity: 0.85;
+}
+
+.link:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.divider {
+  height: 1px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.15);
+  margin: var(--primitive-spacing-9) 0 var(--primitive-spacing-6);
+}
+
+.bottomRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitive-spacing-6);
+}
+
+@media (min-width: 1200px) {
+  .bottomRow {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.legal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitive-spacing-3);
+}
+
+@media (min-width: 768px) {
+  .legal {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--primitive-spacing-6);
+  }
+}
+
+.copyright {
+  font-family: var(--semantic-font-functional);
+  font-size: var(--semantic-text-body-sm-size);
+  color: var(--primitive-color-text-disabled);
+}
+
+.legalLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--primitive-spacing-5);
+}
+
+.legalLink {
+  font-family: var(--semantic-font-functional);
+  font-size: var(--semantic-text-body-sm-size);
+  color: var(--primitive-color-text-disabled);
+  text-decoration: none;
+}
+
+.legalLink:hover {
+  color: var(--semantic-color-fg-on-dark);
+}
+
+.brandRow {
+  display: flex;
+  align-items: center;
+  gap: var(--primitive-spacing-4);
+}
+
+.mark {
+  width: 22px;
+  height: 22px;
+  color: var(--semantic-color-fg-on-dark);
+}
+
+.socialIcons {
+  display: flex;
+  gap: var(--primitive-spacing-3);
+}
+
+/* Decorative-only in the source (no icon glyph, alt text, or href provided
+   anywhere) — rendered as inert visual placeholders. See ASSUMPTIONS.md. */
+.socialPlaceholder {
+  width: 2.3rem;
+  height: 2.3rem;
+  border-radius: 50%;
+  background: #6b6a6a;
+}

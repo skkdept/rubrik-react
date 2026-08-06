@@ -1,0 +1,12 @@
+/* Guidelines.md §3: "Page width: 1440px — Standard desktop page width."
+   Every section's background is capped at this width and centered, not
+   full-bleed — matches the old repo's own hand-written components (each
+   wraps itself in maxWidth:1440/margin:auto individually); applied once here
+   at the page root instead of duplicating it per section. */
+.page {
+  width: 100%;
+  max-width: var(--semantic-layout-page-width);
+  margin-inline: auto;
+  background: var(--semantic-color-bg-surface);
+  overflow-x: clip;
+}

@@ -1,0 +1,152 @@
+/* ────────────────────────────────────────────────────────────────────────
+ * Tier 1 — Primitive tokens
+ * Raw values only, ported from the old repo's `theme.css` (--rubrik-* custom
+ * properties) and `guidelines/Guidelines.md`. Never referenced directly from
+ * component CSS — see semantic.css for the role-based aliases components use.
+ * Provenance/contrast ratios: see ASSUMPTIONS.md and the old repo's Guidelines.md.
+ * ──────────────────────────────────────────────────────────────────────── */
+:root {
+  /* Brand palette */
+  --primitive-color-ink: #12201f;
+  --primitive-color-white: #ffffff;
+  --primitive-color-teal-primary: #00c5b5;
+  --primitive-color-teal-dark: #00b4a5;
+  --primitive-color-teal-light: #00d5c3;
+  --primitive-color-deep-teal: #144f53;
+  --primitive-color-cyan-bright: #00f5ff;
+  --primitive-color-mint-green: #8ae9ad;
+
+  /* Text hierarchy */
+  --primitive-color-text-secondary: #444444;
+  --primitive-color-text-tertiary: #595959;
+  --primitive-color-text-muted: #6b7280;
+  --primitive-color-text-placeholder: #7d7d7d;
+  --primitive-color-text-disabled: #99a1af;
+  --primitive-color-text-slate: #435366;
+  --primitive-color-text-navy: #011735;
+
+  /* Surfaces */
+  --primitive-color-surface-gray-50: #f7f7f7;
+  --primitive-color-surface-warm-white: #faf5f1;
+  --primitive-color-surface-teal-tint: #ebf9f8;
+  --primitive-color-surface-faq: #f5f1ea;
+  --primitive-color-surface-faq-item: #fae4e0;
+  --primitive-color-surface-faq-item-clicked: #f3efeb;
+  --primitive-color-surface-banner: #f4ede8;
+
+  /* Borders & interactive */
+  --primitive-color-border-default: #e5e7eb;
+  --primitive-color-border-teal: #d2e6e4;
+  --primitive-color-border-medium: #d9d9d9;
+  --primitive-color-border-strong: #4e4e4e;
+  --primitive-color-link: #008199;
+
+  /* Not documented by design — placeholder pending a real spec. See ASSUMPTIONS.md. */
+  --primitive-color-destructive: #d4183d;
+
+  /* Decorative gradient (angle undocumented — see ASSUMPTIONS.md) */
+  --primitive-color-gradient-teal: #00dcca;
+  --primitive-color-gradient-yellow: #fbff00;
+
+  /* Typefaces — not loaded via @font-face yet. FK Grotesk is a grotesque-style
+     sans (same family as Helvetica/Arial/Univers) — fall back to those
+     directly rather than a humanist system-ui font (e.g. San Francisco),
+     which is a different letterform style and reads noticeably off-brand.
+     Deliberately NOT listing "Helvetica Neue" explicitly: on macOS it's a
+     genuinely different font from plain Helvetica (measured ~1.5% wider for
+     the same string) rather than an alias, so naming it ahead of the generic
+     `sans-serif` keyword silently swaps in a different typeface than what
+     `sans-serif` alone resolves to. See ASSUMPTIONS.md. */
+  --primitive-font-family-sans: "FK Grotesk", Helvetica, Arial, sans-serif;
+  --primitive-font-family-mono: "FK Grotesk Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  /* Every one of the source's ~36 "Tiempos Text" declarations (across all 5
+     hand-written components and the generated file) falls back to the
+     generic `sans-serif` keyword, never `serif` — a consistent convention,
+     not a one-off typo. Matching it: without the real Tiempos Text file,
+     "narrative" text renders in the same sans fallback as everything else,
+     not Georgia. See ASSUMPTIONS.md. */
+  --primitive-font-family-serif: "Tiempos Text", sans-serif;
+
+  --primitive-font-weight-regular: 400;
+  --primitive-font-weight-medium: 500;
+  --primitive-font-weight-bold: 700;
+
+  /* Type scale — sizes */
+  --primitive-font-size-display-hero: 5rem; /* 80px */
+  --primitive-font-size-display-hero-accent: 4.5rem; /* 72px */
+  --primitive-font-size-display-statement: 4rem; /* 64px */
+  --primitive-font-size-heading-1: 2.75rem; /* 44px */
+  --primitive-font-size-heading-2: 2.5rem; /* 40px */
+  --primitive-font-size-heading-3: 2.125rem; /* 34px */
+  --primitive-font-size-heading-4: 1.75rem; /* 28px */
+  --primitive-font-size-body-lg: 1.25rem; /* 20px */
+  --primitive-font-size-body-base: 1rem; /* 16px */
+  --primitive-font-size-body-sm: 0.875rem; /* 14px */
+  --primitive-font-size-ui-button: 0.875rem; /* 14px */
+  --primitive-font-size-ui-nav: 0.875rem; /* 14px */
+  --primitive-font-size-ui-label: 1rem; /* 16px */
+  --primitive-font-size-label-mono: 0.75rem; /* 12px */
+
+  /* Type scale — line heights (unitless) */
+  --primitive-font-line-height-display-hero: 0.92;
+  --primitive-font-line-height-display-hero-accent: 0.92;
+  --primitive-font-line-height-display-statement: 0.92;
+  --primitive-font-line-height-heading-1: 0.96;
+  --primitive-font-line-height-heading-2: 0.96;
+  --primitive-font-line-height-heading-3: 0.96;
+  --primitive-font-line-height-heading-4: 0.96;
+  --primitive-font-line-height-body-lg: 1.3;
+  --primitive-font-line-height-body-base: 1.5;
+  --primitive-font-line-height-body-sm: 1.4;
+  --primitive-font-line-height-ui-button: 1;
+  --primitive-font-line-height-ui-nav: 1;
+  --primitive-font-line-height-ui-label: 1.5;
+  --primitive-font-line-height-label-mono: 0.96;
+
+  /* Type scale — letter spacing (0 omitted where documented as 0) */
+  --primitive-font-letter-spacing-display-hero: -0.04em;
+  --primitive-font-letter-spacing-display-hero-accent: -0.04em;
+  --primitive-font-letter-spacing-display-statement: -0.04em;
+  --primitive-font-letter-spacing-heading-1: -0.04em;
+  --primitive-font-letter-spacing-heading-2: -0.04em;
+  --primitive-font-letter-spacing-heading-3: normal;
+  --primitive-font-letter-spacing-heading-4: normal;
+  --primitive-font-letter-spacing-label-mono: 0.05em;
+
+  /* Spacing scale — 4 to 160px, per Guidelines.md §3 (120px has no Tailwind
+     equivalent in the old repo; irrelevant here since we don't use Tailwind) */
+  --primitive-spacing-1: 0.25rem; /* 4px */
+  --primitive-spacing-2: 0.5rem; /* 8px */
+  --primitive-spacing-3: 0.75rem; /* 12px */
+  --primitive-spacing-4: 1rem; /* 16px */
+  --primitive-spacing-5: 1.25rem; /* 20px */
+  --primitive-spacing-6: 1.5rem; /* 24px */
+  --primitive-spacing-7: 2rem; /* 32px */
+  --primitive-spacing-8: 2.5rem; /* 40px */
+  --primitive-spacing-9: 3rem; /* 48px */
+  --primitive-spacing-10: 4rem; /* 64px */
+  --primitive-spacing-11: 5rem; /* 80px */
+  --primitive-spacing-12: 6rem; /* 96px */
+  --primitive-spacing-13: 7.5rem; /* 120px */
+  --primitive-spacing-14: 10rem; /* 160px */
+
+  /* Radius — ported from theme.css's generic --radius (0.625rem) and its
+     derived sm/md/lg/xl steps; --primitive-radius-full added for pills
+     (small CTA buttons, progress dots, badges) seen throughout the components. */
+  --primitive-radius-sm: 0.375rem; /* 6px */
+  --primitive-radius-md: 0.5625rem; /* 9px */
+  --primitive-radius-lg: 0.625rem; /* 10px */
+  --primitive-radius-xl: 0.875rem; /* 14px */
+  --primitive-radius-full: 9999px;
+
+  /* Grid & layout */
+  --primitive-grid-columns-desktop: 12;
+  --primitive-grid-columns-tablet: 8; /* undocumented — see ASSUMPTIONS.md */
+  --primitive-grid-columns-mobile: 4;
+  --primitive-grid-gap: 1.5rem; /* 24px, card grid gap */
+  --primitive-grid-page-width: 90rem; /* 1440px */
+  --primitive-grid-content-width: 82rem; /* 1312px */
+  --primitive-grid-margin: 4rem; /* 64px */
+  --primitive-grid-section-padding: 5rem; /* 80px */
+  --primitive-grid-heading-to-body-gap: 10rem; /* 160px */
+}

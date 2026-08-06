@@ -1,0 +1,97 @@
+.section {
+  background: var(--semantic-color-bg-surface);
+  padding-block: var(--primitive-spacing-8);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--semantic-layout-grid-gap);
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    align-items: start;
+  }
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--semantic-layout-grid-gap);
+}
+
+/* Square corners, photo-on-top + a separate off-white content block below —
+   per source (no border-radius utility on any Stat Card div). */
+.card {
+  display: flex;
+  background: var(--semantic-color-bg-surface-muted);
+}
+
+.tall {
+  flex-direction: column;
+}
+
+.wide {
+  flex-direction: row;
+}
+
+.image {
+  display: block;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.tall .image {
+  width: 100%;
+  aspect-ratio: 2.7 / 1;
+}
+
+.wide .image {
+  width: 40%;
+  max-width: 12.75rem; /* 204px, per source */
+  align-self: stretch;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--primitive-spacing-9);
+  flex: 1 1 0%;
+  min-width: 0;
+  padding: var(--primitive-spacing-4);
+}
+
+.chip {
+  align-self: flex-start;
+  border: 1px solid var(--semantic-color-fg-primary);
+  padding: var(--primitive-spacing-4);
+  font-family: var(--semantic-font-functional);
+  font-size: var(--semantic-text-body-sm-size);
+  color: var(--semantic-color-fg-primary);
+  white-space: nowrap;
+}
+
+.statContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitive-spacing-2);
+}
+
+.stat {
+  font-family: var(--semantic-font-functional);
+  font-weight: var(--semantic-text-heading-1-weight);
+  font-size: clamp(2rem, 8vw, var(--semantic-text-display-hero-accent-size));
+  line-height: var(--semantic-text-display-hero-accent-line-height);
+  letter-spacing: var(--semantic-text-display-hero-accent-letter-spacing);
+  color: var(--semantic-color-fg-primary);
+}
+
+.caption {
+  font-family: var(--semantic-font-narrative);
+  font-size: var(--semantic-text-body-sm-size);
+  line-height: var(--semantic-text-body-sm-line-height);
+  color: var(--semantic-color-fg-primary);
+}

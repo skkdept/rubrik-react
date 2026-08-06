@@ -1,0 +1,364 @@
+.section {
+  width: 100%;
+  background: var(--semantic-color-bg-surface);
+}
+
+.heading {
+  padding: var(--primitive-spacing-8) var(--primitive-spacing-4) var(--primitive-spacing-4);
+  display: none;
+}
+
+@media (min-width: 1200px) {
+  .heading {
+    display: block;
+    padding: 5.6875rem 4.25rem 1.875rem; /* 91px 68px 30px, per source */
+  }
+}
+
+.headingLine1,
+.headingLine2 {
+  font-family: var(--semantic-font-functional);
+  font-weight: var(--semantic-text-heading-1-weight);
+  font-size: var(--semantic-text-heading-1-size);
+  letter-spacing: var(--semantic-text-heading-1-letter-spacing);
+  line-height: var(--semantic-text-heading-1-line-height);
+}
+
+.headingLine1 {
+  color: var(--semantic-color-fg-primary);
+}
+
+.headingLine2 {
+  color: var(--primitive-color-text-secondary);
+}
+
+/* ── Desktop: scroll-locked stack ── */
+.stackViewport {
+  position: relative;
+  width: 100%;
+  height: 100svh;
+  min-height: 37.5rem;
+  overflow: hidden;
+}
+
+.card {
+  position: absolute;
+  inset: 0;
+  transition:
+    transform 650ms cubic-bezier(0.33, 1, 0.68, 1),
+    opacity 1100ms ease-out;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+}
+
+.cardInner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--semantic-color-bg-surface);
+  overflow: hidden;
+}
+
+.cardBody {
+  display: flex;
+  height: 100%;
+}
+
+.textPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitive-spacing-7);
+  width: 29.8125rem; /* 477px */
+  flex-shrink: 0;
+  padding: 6.0625rem var(--primitive-spacing-6) var(--primitive-spacing-8) 4.25rem;
+  overflow-y: auto;
+}
+
+.badgeRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitive-spacing-4);
+  max-width: 16rem;
+}
+
+.categoryRow {
+  display: flex;
+  align-items: center;
+  gap: var(--primitive-spacing-3);
+}
+
+.categoryDot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--primitive-color-teal-primary);
+  flex-shrink: 0;
+}
+
+.category {
+  font-family: var(--semantic-font-label);
+  font-size: var(--semantic-text-label-mono-size);
+  font-weight: var(--semantic-text-label-mono-weight);
+  letter-spacing: var(--semantic-text-label-mono-letter-spacing);
+  color: var(--semantic-color-fg-primary);
+}
+
+.title {
+  font-family: var(--semantic-font-functional);
+  font-weight: var(--semantic-text-heading-2-weight);
+  font-size: clamp(1.5rem, 2.7vw, 2.375rem);
+  line-height: var(--semantic-text-heading-2-line-height);
+  letter-spacing: var(--semantic-text-heading-2-letter-spacing);
+  color: var(--semantic-color-fg-primary);
+  overflow-wrap: break-word;
+}
+
+.textBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitive-spacing-5);
+}
+
+.description {
+  font-family: var(--semantic-font-narrative);
+  font-size: var(--semantic-text-body-base-size);
+  line-height: var(--semantic-text-body-base-line-height);
+  color: var(--semantic-color-fg-slate);
+}
+
+.features {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitive-spacing-1);
+}
+
+.feature {
+  display: flex;
+  gap: var(--primitive-spacing-3);
+  align-items: flex-start;
+}
+
+.featureDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--primitive-color-teal-primary);
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+
+.featureText {
+  font-family: var(--semantic-font-narrative);
+  font-size: var(--semantic-text-body-sm-size);
+  line-height: var(--semantic-text-body-sm-line-height);
+  color: var(--semantic-color-fg-primary);
+}
+
+/* Cards 2–4 start hidden and fade+slide in once the card becomes the active
+   (top) card — card 1 is visible from load, matching the old behavior. */
+.enterOnActive {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 500ms ease 150ms,
+    transform 500ms ease 150ms;
+}
+
+.card[data-active="true"] .enterOnActive {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enterOnActive {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+.imagePanel {
+  position: relative;
+  flex: 1 1 0%;
+  overflow: hidden;
+  display: none;
+}
+
+.imagePanel img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--semantic-color-border-teal);
+}
+
+.playButton {
+  position: absolute;
+  right: 50%;
+  top: 44%;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  background: var(--primitive-color-border-medium);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.playButton svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.statBox {
+  position: absolute;
+  right: var(--primitive-spacing-9);
+  bottom: 5.3125rem;
+  background: var(--semantic-color-bg-surface);
+  display: flex;
+  align-items: center;
+  gap: var(--primitive-spacing-3);
+  padding: var(--primitive-spacing-5) var(--primitive-spacing-4);
+}
+
+.statValue {
+  font-family: var(--semantic-font-functional);
+  font-weight: var(--semantic-text-heading-1-weight);
+  font-size: clamp(2rem, 3.6vw, 3.25rem);
+  line-height: var(--semantic-text-display-hero-accent-line-height);
+  letter-spacing: var(--semantic-text-display-hero-accent-letter-spacing);
+  color: var(--semantic-color-fg-link);
+}
+
+.statLabel {
+  font-family: var(--semantic-font-narrative);
+  font-size: var(--semantic-text-body-sm-size);
+  line-height: var(--semantic-text-body-sm-line-height);
+  color: var(--semantic-color-fg-primary);
+  max-width: 8.5rem;
+}
+
+@media (min-width: 1200px) {
+  .imagePanel {
+    display: block;
+  }
+  .divider {
+    display: block;
+  }
+}
+
+.controls {
+  position: absolute;
+  bottom: var(--primitive-spacing-6);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: var(--primitive-spacing-4);
+}
+
+.navButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 1px solid var(--semantic-color-border-teal);
+  background: var(--semantic-color-bg-surface);
+}
+
+.navButton:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.navButton svg {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.dots {
+  display: flex;
+  gap: var(--primitive-spacing-2);
+  align-items: center;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: none;
+  border-radius: var(--primitive-radius-full);
+  background: var(--semantic-color-border-teal);
+  transition: all 400ms cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.dotActive {
+  width: 24px;
+  background: var(--primitive-color-teal-primary);
+}
+
+.dotSeen {
+  background: var(--primitive-color-teal-primary);
+}
+
+.counter {
+  position: absolute;
+  top: var(--primitive-spacing-6);
+  right: var(--primitive-spacing-7);
+  z-index: 50;
+  font-family: var(--semantic-font-label);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: var(--semantic-color-fg-slate);
+}
+
+/* ── Mobile/tablet: static stacked list ── */
+.staticList {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: var(--primitive-spacing-6);
+}
+
+.staticItem {
+  border-top: 1px solid var(--semantic-color-border-teal);
+}
+
+.staticItem:first-child {
+  border-top: none;
+}
+
+.staticItem .cardInner {
+  height: auto;
+}
+
+.staticItem .textPanel {
+  width: 100%;
+  padding: var(--primitive-spacing-8) var(--primitive-spacing-4) var(--primitive-spacing-6);
+  overflow-y: visible;
+}
+
+.staticItem .title {
+  font-size: clamp(1.5rem, 7vw, 2rem);
+}
+
+@media (min-width: 1200px) {
+  .staticList {
+    display: none;
+  }
+}

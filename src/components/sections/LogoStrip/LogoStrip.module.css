@@ -1,0 +1,56 @@
+.strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--primitive-spacing-4) var(--primitive-spacing-7);
+  background: var(--semantic-color-bg-surface);
+  padding: var(--primitive-spacing-4) var(--primitive-spacing-6);
+}
+
+@media (min-width: 1200px) {
+  .strip {
+    flex-wrap: nowrap;
+    height: 3.5rem; /* 56px, per source */
+    padding-inline: 3.5rem; /* 56px, per source */
+    gap: var(--primitive-spacing-7); /* 32px, per source */
+  }
+}
+
+.group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--primitive-spacing-5); /* 24px, per source */
+}
+
+.mark {
+  display: block;
+  flex-shrink: 0;
+}
+
+.divider {
+  width: 1px;
+  height: 1.87rem; /* ~29.9px, per source */
+  background: var(--semantic-color-fg-primary);
+  flex-shrink: 0;
+}
+
+/* Icon + wordmark overlap into one unit, per source (a CSS-grid single-cell
+   placement in the original export). Fixed size accounts for the wordmark
+   extending past the icon's own box: max(icon width, offset + wordmark
+   width/height) — consistent across all 3 groups' dual marks. */
+.dual {
+  position: relative;
+  display: inline-block;
+  width: 71.63px;
+  height: 18.53px;
+  flex-shrink: 0;
+}
+
+.dualWordmark {
+  position: absolute;
+  left: 25.05px;
+  top: 2.54px;
+}

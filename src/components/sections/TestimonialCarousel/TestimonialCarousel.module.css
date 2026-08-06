@@ -1,0 +1,256 @@
+.section {
+  width: 100%;
+  background: var(--semantic-color-bg-surface);
+  padding-block: var(--primitive-spacing-9);
+}
+
+/* ── Mobile: static stacked cards ── */
+.mobileList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitive-spacing-4);
+  padding-inline: var(--primitive-spacing-4);
+}
+
+.mobileCard {
+  background: var(--semantic-color-bg-surface-dark);
+  border-radius: var(--primitive-radius-lg);
+  border: 1px solid var(--semantic-color-border-teal);
+  overflow: hidden;
+}
+
+.mobilePhoto {
+  position: relative;
+  width: 100%;
+  height: 12.5rem;
+  background: var(--primitive-color-border-medium);
+  overflow: hidden;
+}
+
+.mobilePhoto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.badge {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background: var(--semantic-color-bg-surface);
+  height: 2.5rem;
+  width: 7.125rem;
+  padding-right: var(--primitive-spacing-3);
+  border-top-right-radius: var(--primitive-radius-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--primitive-spacing-2);
+}
+
+.badgeMark {
+  width: 20px;
+  height: 20px;
+  color: var(--semantic-color-fg-primary);
+}
+
+.badgeText {
+  font-family: var(--semantic-font-functional);
+  font-weight: var(--semantic-text-heading-4-weight);
+  font-size: var(--semantic-text-body-sm-size);
+  color: var(--semantic-color-fg-primary);
+}
+
+.mobileBody {
+  padding: var(--primitive-spacing-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitive-spacing-5);
+}
+
+.stat {
+  color: var(--semantic-color-fg-on-dark);
+  font-family: var(--semantic-font-functional);
+  font-weight: var(--semantic-text-heading-1-weight);
+  font-size: clamp(3rem, 14vw, 4.5rem);
+  line-height: var(--semantic-text-display-hero-accent-line-height);
+  letter-spacing: -0.06em;
+}
+
+.quote {
+  color: var(--semantic-color-fg-on-dark);
+  font-family: var(--semantic-font-functional);
+  font-weight: var(--semantic-text-heading-4-weight);
+  font-size: clamp(1.0625rem, 4.5vw, 1.375rem);
+  line-height: 1.25;
+}
+
+.byline {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.name {
+  color: var(--semantic-color-fg-on-dark);
+  font-family: var(--semantic-font-label);
+  font-size: var(--semantic-text-label-mono-size);
+  line-height: var(--semantic-text-body-sm-line-height);
+}
+
+.role {
+  color: var(--primitive-color-text-disabled);
+  font-family: var(--semantic-font-label);
+  font-size: var(--semantic-text-label-mono-size);
+  line-height: var(--semantic-text-body-sm-line-height);
+}
+
+/* ── Desktop: hover/focus-expanding carousel ── */
+.desktopRow {
+  display: none;
+}
+
+@media (min-width: 1200px) {
+  .mobileList {
+    display: none;
+  }
+
+  .desktopRow {
+    display: flex;
+    flex-direction: row;
+    gap: var(--primitive-spacing-4);
+    height: 30.625rem; /* 490px */
+    padding-inline: 4.25rem;
+  }
+}
+
+.desktopCard {
+  flex: 1 1 0%;
+  min-width: 0;
+  overflow: hidden;
+  transition: flex 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.desktopCard.desktopCardActive {
+  flex: 3 1 0%;
+}
+
+.desktopCardShell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: var(--primitive-spacing-4);
+  background: var(--semantic-color-bg-surface);
+  border: 1px solid var(--semantic-color-border-teal);
+  display: flex;
+  flex-direction: column;
+}
+
+.desktopCardInner {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  border-radius: var(--primitive-radius-lg);
+  overflow: hidden;
+  background: var(--semantic-color-bg-surface-dark);
+  width: 100%;
+  height: 100%;
+}
+
+.photoStrip {
+  position: relative;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: var(--primitive-radius-lg);
+  width: 12.75rem;
+  height: 100%;
+  background: var(--primitive-color-border-medium);
+}
+
+.photoStrip img {
+  position: absolute;
+  height: 100%;
+  max-width: none;
+  top: 0;
+  width: 420%;
+  object-fit: cover;
+}
+
+.photoStrip .badge {
+  border-bottom-left-radius: var(--primitive-radius-lg);
+  z-index: 1;
+}
+
+.textPanel {
+  flex: 0 0 0px;
+  overflow: hidden;
+  min-width: 0;
+  transition: flex 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.desktopCardActive .textPanel {
+  flex: 1 1 0%;
+}
+
+.textPanelInner {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: var(--semantic-color-fg-on-dark);
+  height: 100%;
+  padding: var(--primitive-spacing-6);
+  min-width: 0;
+  box-sizing: border-box;
+  background: var(--semantic-color-bg-surface-dark);
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.desktopCardActive .textPanelInner {
+  opacity: 1;
+  transition: opacity 350ms ease 150ms;
+}
+
+.textPanelTop {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5625rem;
+}
+
+.desktopStat {
+  font-family: var(--semantic-font-functional);
+  font-weight: var(--semantic-text-heading-1-weight);
+  font-size: 4.5rem;
+  line-height: var(--semantic-text-display-hero-accent-line-height);
+  letter-spacing: -0.08em;
+}
+
+.desktopQuote {
+  font-family: var(--semantic-font-functional);
+  font-weight: var(--semantic-text-heading-1-weight);
+  font-size: var(--semantic-text-heading-4-size);
+  line-height: var(--semantic-text-heading-4-line-height);
+  max-width: 23.75rem;
+}
+
+.desktopName {
+  font-family: var(--semantic-font-label);
+  font-size: var(--semantic-text-label-mono-size);
+  line-height: var(--semantic-text-heading-4-line-height);
+}
+
+.desktopRole {
+  font-family: var(--semantic-font-label);
+  font-size: var(--semantic-text-label-mono-size);
+  line-height: var(--semantic-text-heading-4-line-height);
+  color: var(--primitive-color-text-disabled);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .desktopCard,
+  .textPanel,
+  .textPanelInner {
+    transition: none;
+  }
+}

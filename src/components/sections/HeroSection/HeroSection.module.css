@@ -1,0 +1,265 @@
+.hero {
+  position: relative;
+  width: 100%;
+  background: var(--semantic-color-bg-surface);
+  overflow: hidden;
+  padding-block: var(--primitive-spacing-11); /* 80px, per Guidelines.md Hero (80px) */
+}
+
+.backgroundArt {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.backgroundArt img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Fine technical grid overlay on the earth photo. The source's version of
+   this is 509 tiny "+" tick-mark components — a short vertical stroke plus a
+   short horizontal stroke per intersection (~12px arms, ~1.9px thick,
+   #12201F at ~8.4% effective opacity: parent `opacity-31` × path
+   `stroke-opacity: 0.27`) — each positioned via a Figma-exported
+   container-query trick: a *zero-width* anchor `div` with
+   `container-type: size`, then a child sized in `cqw`/`cqh` relative to that
+   zero-size box. Querying container units against a zero-size container is
+   undefined; Chromium's fallback resolves it to garbage (e.g.
+   `w-[93214300cqw]`), so ~90% of these ticks actually render as
+   thousand-plus-pixel rectangles clipped by the Hero's `overflow: hidden`
+   into what looks like solid dark bars slicing through the headline — a
+   rendering bug, not a texture anyone designed (confirmed via
+   `getBoundingClientRect` on every grid element live). This recreates the
+   evident pre-bug intent instead: small isolated crosshair ticks with gaps
+   between them, tiled via a small SVG (a "+" can't be built from
+   `linear-gradient` alone — it needs 2D shape, not just a repeating line).
+   See ASSUMPTIONS.md. */
+.backgroundGrid {
+  position: absolute;
+  top: 3.5%;
+  left: 2.7%;
+  right: 2.7%;
+  bottom: 0;
+  z-index: 0;
+  pointer-events: none;
+  /* Two layers sharing the same 61px pitch: continuous hairlines (so it
+     reads as an actual connected grid) plus the crosshair SVG tile on top
+     for slightly reinforced intersections. The line layer's
+     background-position is offset by half a tile (30.5px) so its crossings
+     land exactly on the crosshair centers instead of the tile corners. */
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='61' height='61' viewBox='0 0 61 61'%3E%3Crect x='24.5' y='29.5' width='12' height='2' fill='%2312201F' fill-opacity='0.084'/%3E%3Crect x='29.5' y='24.5' width='2' height='12' fill='%2312201F' fill-opacity='0.084'/%3E%3C/svg%3E"),
+    linear-gradient(to right, rgba(18, 32, 31, 0.084) 0 1.5px, transparent 1.5px),
+    linear-gradient(to bottom, rgba(18, 32, 31, 0.084) 0 1.5px, transparent 1.5px);
+  background-size: 61px 61px, 61px 61px, 61px 61px;
+  background-position: 0 0, 30.5px 30.5px, 30.5px 30.5px;
+}
+
+/* Decorative light sweep: a bright-white copy of the same grid pattern,
+   revealed only through a moving diagonal band (a CSS mask, not an actual
+   light source) so it looks like the intersections catch light as it
+   passes top-left to bottom-right. Purely an added flourish — nothing in
+   the source does this. */
+.backgroundGrid::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='61' height='61' viewBox='0 0 61 61'%3E%3Crect x='24.5' y='29.5' width='12' height='2' fill='white'/%3E%3Crect x='29.5' y='24.5' width='2' height='12' fill='white'/%3E%3C/svg%3E"),
+    linear-gradient(to right, rgba(255, 255, 255, 0.9) 0 1.5px, transparent 1.5px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.9) 0 1.5px, transparent 1.5px);
+  background-size: 61px 61px, 61px 61px, 61px 61px;
+  background-position: 0 0, 30.5px 30.5px, 30.5px 30.5px;
+  /* A diagonal band on a tight mask canvas, moved across the whole element
+     via `mask-position` — keeps the "band is at offset X within the
+     canvas" math simple (X=150px) so the screen-space travel distance is
+     just 150px + mask-position, independent of element size. Kept
+     relatively narrow (120px transition) since the Hero is much wider than
+     tall — a wider band's diagonal reads as a broad wash rather than a
+     line at that aspect ratio.
+
+     No held start/end keyframes: earlier versions paused at the
+     off-canvas start and end positions, which read as "a delay, then it
+     plays once and stops." The travel distance also matters here, not
+     just the keyframe structure: mask-repeat is no-repeat, so the tile
+     goes fully invisible once its position passes the element's actual
+     rendered height (it's the shorter axis, so it's the first one the
+     diagonal falls out of — measured ~1144px tall at desktop widths,
+     ~904px at mobile). An earlier version traveled on to 1900px anyway,
+     so roughly a third of every cycle was the tile continuing to move
+     through space well past the point of becoming invisible — the sweep
+     looked like it "finished early" while the loop silently ran out the
+     clock. Endpoints below are sized to the measured box (plus a small
+     margin) so the animation's full duration is spent on-screen. */
+  --sweep-band: linear-gradient(135deg, transparent 0, transparent 90px, white 150px, transparent 210px, transparent 300px);
+  -webkit-mask-image: var(--sweep-band);
+  mask-image: var(--sweep-band);
+  -webkit-mask-size: 300px 300px;
+  mask-size: 300px 300px;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: -300px -300px;
+  mask-position: -300px -300px;
+  animation: gridLightSweep 8s linear infinite;
+}
+
+@keyframes gridLightSweep {
+  from {
+    -webkit-mask-position: -300px -300px;
+    mask-position: -300px -300px;
+  }
+  to {
+    -webkit-mask-position: 400px 400px;
+    mask-position: 400px 400px;
+  }
+}
+
+@media (min-width: 768px) {
+  @keyframes gridLightSweep {
+    from {
+      -webkit-mask-position: -300px -300px;
+      mask-position: -300px -300px;
+    }
+    to {
+      -webkit-mask-position: 1150px 1150px;
+      mask-position: 1150px 1150px;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backgroundGrid::after {
+    animation: none;
+    content: none;
+  }
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--primitive-spacing-6);
+  max-width: 42rem;
+  margin-inline: auto;
+  text-align: center;
+}
+
+/* Fade+slide-up entrance, staggered per element via --hero-delay. Distinct
+   from the sitewide scroll-reveal since the hero animates on load, not on
+   viewport entry. */
+.heroItem {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: heroFadeUp 1200ms cubic-bezier(0.19, 1, 0.22, 1) both;
+  animation-delay: var(--hero-delay, 0ms);
+}
+
+@keyframes heroFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heroItem {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.kicker {
+  font-family: var(--semantic-font-label);
+  font-size: var(--semantic-text-label-mono-size);
+  font-weight: var(--semantic-text-label-mono-weight);
+  letter-spacing: var(--semantic-text-label-mono-letter-spacing);
+  text-transform: uppercase;
+  color: var(--semantic-color-fg-brand);
+}
+
+.headline {
+  font-family: var(--semantic-font-functional);
+  font-weight: var(--semantic-text-display-hero-weight);
+  color: var(--semantic-color-fg-primary);
+  font-size: clamp(2rem, 5vw + 1rem, var(--semantic-text-display-hero-size));
+  line-height: var(--semantic-text-display-hero-line-height);
+  letter-spacing: var(--semantic-text-display-hero-letter-spacing);
+}
+
+.subtitle {
+  font-family: var(--semantic-font-functional);
+  font-size: var(--semantic-text-body-lg-size);
+  line-height: var(--semantic-text-body-lg-line-height);
+  color: var(--semantic-color-fg-secondary);
+  max-width: 34rem;
+}
+
+.ctaRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--primitive-spacing-3);
+  width: 100%;
+}
+
+.searchBar {
+  width: 100%;
+  max-width: 32rem;
+}
+
+.askButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--primitive-spacing-2) var(--primitive-spacing-5);
+  background: var(--semantic-color-cta-primary-bg);
+  color: var(--semantic-color-cta-primary-fg);
+  border: none;
+  border-radius: var(--primitive-radius-md);
+  font-family: var(--semantic-font-functional);
+  font-weight: var(--semantic-text-ui-button-weight);
+  font-size: var(--semantic-text-ui-button-size);
+  text-transform: uppercase;
+}
+
+/* Empty product-screenshot slot — never filled in the source design either.
+   See ASSUMPTIONS.md. Rendered as a decorative placeholder, not a real image,
+   so it carries no alt text and is hidden from assistive tech. */
+.mediaPlaceholder {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 74rem;
+  height: 20rem;
+  margin: var(--primitive-spacing-9) auto 0;
+  background: var(--semantic-color-bg-surface-dark);
+  border-radius: var(--primitive-radius-xl);
+}
+
+@media (min-width: 768px) {
+  .mediaPlaceholder {
+    height: 25rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .headline {
+    font-size: var(--semantic-text-display-hero-size);
+  }
+
+  .mediaPlaceholder {
+    height: 35.6875rem; /* 571px, per source */
+  }
+}

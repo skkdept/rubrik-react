@@ -1,0 +1,150 @@
+/* ────────────────────────────────────────────────────────────────────────
+ * Tier 2 — Semantic tokens
+ * Role-based aliases that resolve to Tier 1 primitives. Components only ever
+ * reference these, never primitives.css directly — that's what makes a future
+ * EDS conversion a mechanical rename rather than a redesign.
+ * ──────────────────────────────────────────────────────────────────────── */
+:root {
+  /* Foreground (text) */
+  --semantic-color-fg-primary: var(--primitive-color-ink); /* AAA 16.77:1 */
+  --semantic-color-fg-secondary: var(--primitive-color-text-secondary); /* AAA 9.74:1 */
+  --semantic-color-fg-tertiary: var(--primitive-color-text-tertiary); /* AAA 7.00:1 */
+  --semantic-color-fg-slate: var(--primitive-color-text-slate); /* AAA 7.87:1 */
+  --semantic-color-fg-navy: var(--primitive-color-text-navy); /* AAA 17.87:1 */
+  --semantic-color-fg-on-dark: var(--primitive-color-white); /* AAA 16.77:1 on ink */
+  --semantic-color-fg-muted: var(--primitive-color-text-muted); /* AA 4.83:1 */
+  --semantic-color-fg-placeholder: var(--primitive-color-text-placeholder); /* AA Large, min 18px */
+  --semantic-color-fg-disabled: var(--primitive-color-text-disabled); /* dark backgrounds only */
+  --semantic-color-fg-brand: var(--primitive-color-deep-teal); /* AAA 9.24:1 */
+  --semantic-color-fg-link: var(--primitive-color-link); /* AA Large 4.57:1 */
+  --semantic-color-fg-destructive: var(--primitive-color-destructive); /* placeholder, see ASSUMPTIONS.md */
+
+  /* Decorative-only text colors (never on light backgrounds as body text) */
+  --semantic-color-fg-decorative-teal: var(--primitive-color-teal-primary);
+  --semantic-color-fg-decorative-cyan: var(--primitive-color-cyan-bright);
+  --semantic-color-fg-decorative-mint: var(--primitive-color-mint-green);
+
+  /* Backgrounds / surfaces */
+  --semantic-color-bg-surface: var(--primitive-color-white);
+  --semantic-color-bg-surface-muted: var(--primitive-color-surface-gray-50);
+  --semantic-color-bg-surface-warm: var(--primitive-color-surface-warm-white);
+  --semantic-color-bg-surface-teal-tint: var(--primitive-color-surface-teal-tint);
+  --semantic-color-bg-surface-dark: var(--primitive-color-ink);
+  --semantic-color-bg-surface-faq: var(--primitive-color-surface-faq);
+  --semantic-color-bg-surface-faq-item: var(--primitive-color-surface-faq-item);
+  --semantic-color-bg-surface-faq-item-clicked: var(--primitive-color-surface-faq-item-clicked);
+  --semantic-color-bg-surface-banner: var(--primitive-color-surface-banner);
+  --semantic-color-bg-brand-fill: var(--primitive-color-teal-primary); /* fills only, fails as text-on-white */
+  --semantic-color-bg-accent: var(--primitive-color-mint-green);
+  --semantic-color-bg-destructive: var(--primitive-color-destructive);
+
+  /* Borders */
+  --semantic-color-border-default: var(--primitive-color-border-default);
+  --semantic-color-border-teal: var(--primitive-color-border-teal);
+  --semantic-color-border-medium: var(--primitive-color-border-medium);
+  --semantic-color-border-strong: var(--primitive-color-border-strong);
+  /* Exact hex not given in source for the Secondary CTA border — inferred as
+     Deep Teal per Guidelines.md's own inference note. See ASSUMPTIONS.md. */
+  --semantic-color-border-cta-secondary: var(--primitive-color-deep-teal);
+  /* FAQ divider "darkens" on open with no hex given — see ASSUMPTIONS.md */
+  --semantic-color-border-faq-default: #d6cec7;
+  --semantic-color-border-faq-open: #b3aba6;
+
+  /* CTA button system — 4 documented styles, all AAA contrast pairs */
+  --semantic-color-cta-primary-bg: var(--primitive-color-deep-teal); /* 9.24:1 */
+  --semantic-color-cta-primary-fg: var(--primitive-color-white);
+  --semantic-color-cta-secondary-bg: var(--primitive-color-white); /* 9.24:1 */
+  --semantic-color-cta-secondary-fg: var(--primitive-color-deep-teal);
+  --semantic-color-cta-secondary-border: var(--semantic-color-border-cta-secondary);
+  --semantic-color-cta-accent-bg: var(--primitive-color-mint-green); /* 11.41:1 */
+  --semantic-color-cta-accent-fg: var(--primitive-color-ink);
+  --semantic-color-cta-dark-bg: var(--primitive-color-ink); /* 16.77:1 */
+  --semantic-color-cta-dark-fg: var(--primitive-color-white);
+
+  /* Focus ring */
+  --semantic-color-focus-ring: var(--primitive-color-link);
+
+  /* Typography — family/weight per role (dual-track: sans functional, serif
+     narrative, mono tags/kickers). Size/line-height/letter-spacing stay
+     referenced straight off primitives.css per tier below. */
+  --semantic-font-functional: var(--primitive-font-family-sans);
+  --semantic-font-narrative: var(--primitive-font-family-serif);
+  --semantic-font-label: var(--primitive-font-family-mono);
+
+  --semantic-text-display-hero-size: var(--primitive-font-size-display-hero);
+  --semantic-text-display-hero-line-height: var(--primitive-font-line-height-display-hero);
+  --semantic-text-display-hero-letter-spacing: var(--primitive-font-letter-spacing-display-hero);
+  --semantic-text-display-hero-weight: var(--primitive-font-weight-regular);
+
+  --semantic-text-display-hero-accent-size: var(--primitive-font-size-display-hero-accent);
+  --semantic-text-display-hero-accent-line-height: var(--primitive-font-line-height-display-hero-accent);
+  --semantic-text-display-hero-accent-letter-spacing: var(--primitive-font-letter-spacing-display-hero-accent);
+  --semantic-text-display-hero-accent-weight: var(--primitive-font-weight-medium);
+
+  --semantic-text-display-statement-size: var(--primitive-font-size-display-statement);
+  --semantic-text-display-statement-line-height: var(--primitive-font-line-height-display-statement);
+  --semantic-text-display-statement-letter-spacing: var(--primitive-font-letter-spacing-display-statement);
+  --semantic-text-display-statement-weight: var(--primitive-font-weight-regular);
+
+  --semantic-text-heading-1-size: var(--primitive-font-size-heading-1);
+  --semantic-text-heading-1-line-height: var(--primitive-font-line-height-heading-1);
+  --semantic-text-heading-1-letter-spacing: var(--primitive-font-letter-spacing-heading-1);
+  --semantic-text-heading-1-weight: var(--primitive-font-weight-medium);
+
+  --semantic-text-heading-2-size: var(--primitive-font-size-heading-2);
+  --semantic-text-heading-2-line-height: var(--primitive-font-line-height-heading-2);
+  --semantic-text-heading-2-letter-spacing: var(--primitive-font-letter-spacing-heading-2);
+  --semantic-text-heading-2-weight: var(--primitive-font-weight-medium);
+
+  --semantic-text-heading-3-size: var(--primitive-font-size-heading-3);
+  --semantic-text-heading-3-line-height: var(--primitive-font-line-height-heading-3);
+  --semantic-text-heading-3-letter-spacing: var(--primitive-font-letter-spacing-heading-3);
+  --semantic-text-heading-3-weight: var(--primitive-font-weight-medium);
+
+  --semantic-text-heading-4-size: var(--primitive-font-size-heading-4);
+  --semantic-text-heading-4-line-height: var(--primitive-font-line-height-heading-4);
+  --semantic-text-heading-4-letter-spacing: var(--primitive-font-letter-spacing-heading-4);
+  --semantic-text-heading-4-weight: var(--primitive-font-weight-medium);
+
+  --semantic-text-body-lg-size: var(--primitive-font-size-body-lg);
+  --semantic-text-body-lg-line-height: var(--primitive-font-line-height-body-lg);
+  /* ⚠ As-authored: Body/Large sans is Medium while Base/Small are Regular — see ASSUMPTIONS.md */
+  --semantic-text-body-lg-weight-sans: var(--primitive-font-weight-medium);
+  --semantic-text-body-lg-weight-serif: var(--primitive-font-weight-regular);
+
+  --semantic-text-body-base-size: var(--primitive-font-size-body-base);
+  --semantic-text-body-base-line-height: var(--primitive-font-line-height-body-base);
+  --semantic-text-body-base-weight: var(--primitive-font-weight-regular);
+
+  --semantic-text-body-sm-size: var(--primitive-font-size-body-sm);
+  --semantic-text-body-sm-line-height: var(--primitive-font-line-height-body-sm);
+  --semantic-text-body-sm-weight: var(--primitive-font-weight-regular);
+
+  --semantic-text-ui-button-size: var(--primitive-font-size-ui-button);
+  --semantic-text-ui-button-line-height: var(--primitive-font-line-height-ui-button);
+  /* Source button text is always "FK Grotesk(:Mono):Medium" — weight 500,
+     not bold. See ASSUMPTIONS.md. */
+  --semantic-text-ui-button-weight: var(--primitive-font-weight-medium);
+
+  --semantic-text-ui-nav-size: var(--primitive-font-size-ui-nav);
+  --semantic-text-ui-nav-line-height: var(--primitive-font-line-height-ui-nav);
+  --semantic-text-ui-nav-weight: var(--primitive-font-weight-medium);
+
+  --semantic-text-ui-label-size: var(--primitive-font-size-ui-label);
+  --semantic-text-ui-label-line-height: var(--primitive-font-line-height-ui-label);
+  --semantic-text-ui-label-weight: var(--primitive-font-weight-medium);
+
+  --semantic-text-label-mono-size: var(--primitive-font-size-label-mono);
+  --semantic-text-label-mono-line-height: var(--primitive-font-line-height-label-mono);
+  --semantic-text-label-mono-letter-spacing: var(--primitive-font-letter-spacing-label-mono);
+  --semantic-text-label-mono-weight: var(--primitive-font-weight-medium);
+
+  /* Layout */
+  --semantic-layout-page-width: var(--primitive-grid-page-width);
+  --semantic-layout-content-width: var(--primitive-grid-content-width);
+  --semantic-layout-margin: var(--primitive-grid-margin);
+  --semantic-layout-section-padding: var(--primitive-grid-section-padding);
+  --semantic-layout-heading-to-body-gap: var(--primitive-grid-heading-to-body-gap);
+  --semantic-layout-grid-gap: var(--primitive-grid-gap);
+  --semantic-layout-component-padding: var(--primitive-spacing-4); /* 16px */
+}
