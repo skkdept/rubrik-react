@@ -1,0 +1,76 @@
+.section {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  min-height: 26rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--primitive-spacing-9) var(--semantic-layout-margin);
+}
+
+@media (min-width: 1200px) {
+  .section {
+    min-height: 33.875rem; /* 542px, per source */
+  }
+}
+
+.photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+/* A translucent white layer inset from the section's edges, between the
+   photo and the text content — same layering idea as the Hero's grid
+   background veil. Matches source's rgba(255,255,255,0.7) rect, inset
+   ~42px with 20px corners (`Frame68` in the source). */
+.veil {
+  position: absolute;
+  inset: 2.625rem; /* ~42px, per source */
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 1.25rem; /* 20px, per source */
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--primitive-spacing-7); /* 32px, per source */
+  max-width: 42rem; /* ~672px — source's 839px is wider than this section
+                        typically renders at fluid widths; capped to keep
+                        the heading from running edge-to-edge */
+  /* Without this, `.content`'s automatic minimum width (as a flex item of
+     `.section`) is computed from the email input's default browser width
+     (~170px) baked into the form several flex levels down — `.input`'s own
+     `min-width: 0` only unlocks shrinking within `.inputRow`, it doesn't
+     propagate up through `.field`/`.form`/`.content`. Without this, at
+     narrow viewports `.section` can't shrink `.content` below ~318px even
+     though far less space (~262px on a 390px viewport) is actually
+     available, so the heading and email pill overflow past the veil
+     card's edges instead of sitting inside it. */
+  min-width: 0;
+  text-align: center;
+}
+
+.heading {
+  font-family: var(--semantic-font-functional);
+  font-weight: var(--semantic-text-heading-1-weight);
+  font-size: clamp(1.5rem, 4vw + 0.5rem, var(--semantic-text-heading-1-size));
+  line-height: var(--semantic-text-heading-1-line-height);
+  letter-spacing: var(--semantic-text-heading-1-letter-spacing);
+  color: var(--semantic-color-fg-primary);
+}
+
+.form {
+  width: 100%;
+  max-width: 28rem; /* ~448px — source's pill is 562px, but that width is
+                        specific to a single-line "Email Address" input at
+                        839px section width; scaled down proportionally */
+}

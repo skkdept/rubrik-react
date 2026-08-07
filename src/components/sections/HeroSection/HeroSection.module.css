@@ -6,13 +6,14 @@
   padding-block: var(--primitive-spacing-11); /* 80px, per Guidelines.md Hero (80px) */
 }
 
-/* No CSS opacity here — `hero-background.png` already carries the source's
+/* No CSS opacity here — `hero-background.webp` already carries the source's
    "opacity-38" baked into its own alpha channel (confirmed via canvas pixel
-   readback: every pixel decodes to alpha ~97/255 ≈ 0.38, not 255). An
-   earlier pass also applied `opacity: 0.38` here on top of that, which
-   double-dimmed the photo to ~0.38×0.38≈0.14 instead of 0.38 — the actual
-   root cause of the whole background reading as washed-out, not the veil
-   math (which was already correct). See ASSUMPTIONS.md. */
+   readback: every pixel decodes to alpha ~97/255 ≈ 0.38, not 255; preserved
+   exactly through the PNG→WebP conversion below). An earlier pass also
+   applied `opacity: 0.38` here on top of that, which double-dimmed the
+   photo to ~0.38×0.38≈0.14 instead of 0.38 — the actual root cause of the
+   whole background reading as washed-out, not the veil math (which was
+   already correct). See ASSUMPTIONS.md. */
 .backgroundArt {
   position: absolute;
   inset: 0;

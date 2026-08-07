@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import { Container } from "../../layout/Container/Container";
 import { CtaButton } from "../../ui/CtaButton/CtaButton";
-import heroBackground from "../../../assets/hero-background.png";
+import heroBackground from "../../../assets/hero-background.webp";
 import styles from "./HeroSection.module.css";
 
 function delayStyle(ms: number): CSSProperties {
@@ -12,7 +12,7 @@ export function HeroSection() {
   return (
     <section className={styles.hero} aria-labelledby="hero-heading">
       <div className={styles.backgroundArt} aria-hidden="true">
-        <img src={heroBackground} alt="" />
+        <img src={heroBackground} alt="" fetchPriority="high" />
       </div>
       <div className={styles.backgroundVeil} aria-hidden="true" />
       <div className={styles.backgroundGrid} aria-hidden="true" />

@@ -94,7 +94,7 @@
    and the full-width banner's Container18 use this exact treatment: bg
    white, `rounded-[14029546px]` = fully round, drop-shadow, no border,
    4px/4px/4px/16px padding so the trailing button sits nearly flush with
-   the pill's own edge). Used by both CtaBanner and CtaBannerFull. */
+   the pill's own edge). Used by both Teaser50 and Teaser100. */
 .pill .inputRow {
   background: var(--primitive-color-white);
   border: none;

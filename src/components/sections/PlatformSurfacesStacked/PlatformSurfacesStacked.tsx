@@ -7,7 +7,7 @@ import {
   PLATFORM_SURFACES_HEADING,
   type PlatformSurfaceCard,
 } from "../../../data/platformSurfaces";
-import dataCenterImage from "../../../assets/data-center.png";
+import dataCenterImage from "../../../assets/data-center.webp";
 import styles from "./PlatformSurfacesStacked.module.css";
 
 const TOTAL_CARDS = PLATFORM_SURFACE_CARDS.length;
@@ -66,7 +66,7 @@ function CardPanel({
         </div>
 
         <div className={styles.imagePanel}>
-          <img src={dataCenterImage} alt="" />
+          <img src={dataCenterImage} alt="" loading="lazy" decoding="async" />
           <div className={styles.playButton} aria-hidden="true">
             <PlayIcon />
           </div>

@@ -6,7 +6,7 @@ interface RubrikMarkProps {
   title?: string;
 }
 
-/** The abstract Rubrik symbol mark, shared by SiteHeader and TestimonialCarousel. */
+/** The abstract Rubrik symbol mark, shared by Nav and TestimonialCarousel. */
 export function RubrikMark({ className, title }: RubrikMarkProps) {
   return (
     <svg className={className} viewBox="0 0 22.3418 22.3467" role={title ? "img" : undefined} aria-hidden={title ? undefined : true}>

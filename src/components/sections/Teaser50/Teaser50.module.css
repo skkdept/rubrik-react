@@ -1,0 +1,95 @@
+/* Per source (`HomePage/index.tsx:20117`, `data-name="CTA Section"`): this
+   frame is exactly `w-[1441px]` with no page-margin classes at all — the
+   two cards (650px + 694px + 24px gap) sit centered with only ~36px of
+   slack per side, well under the ~64/80px inset every other section routes
+   through Container/`--semantic-layout-margin`. This section owns its own
+   (narrower) padding directly instead of wrapping content in the shared
+   Container — same pattern as FaqSection/PlatformIntro — so the cards read
+   as noticeably wider/closer to full-bleed than the rest of the page's
+   content column. See ASSUMPTIONS.md. */
+.section {
+  width: 100%;
+  background: var(--semantic-color-bg-surface);
+  padding: var(--primitive-spacing-8) var(--primitive-spacing-4);
+}
+
+@media (min-width: 1200px) {
+  .section {
+    padding: var(--primitive-spacing-9) var(--primitive-spacing-8);
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--semantic-layout-grid-gap);
+}
+
+@media (min-width: 1200px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.card {
+  position: relative;
+  min-height: 22rem;
+  border-radius: var(--primitive-radius-xl);
+  padding: var(--primitive-spacing-8);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--primitive-spacing-7);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.cardDark {
+  background: var(--semantic-color-bg-surface-dark);
+  color: var(--semantic-color-fg-on-dark);
+}
+
+.cardPhoto {
+  color: var(--semantic-color-fg-on-dark);
+}
+
+.cardPhoto img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.cardPhotoScrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(18, 32, 31, 0.15) 0%, rgba(18, 32, 31, 0.65) 100%);
+  z-index: 0;
+}
+
+.cardHeading {
+  position: relative;
+  z-index: 1;
+  font-family: var(--semantic-font-functional);
+  font-weight: var(--semantic-text-heading-2-weight);
+  font-size: clamp(1.5rem, 4vw, var(--semantic-text-heading-2-size));
+  line-height: var(--semantic-text-heading-2-line-height);
+  letter-spacing: var(--semantic-text-heading-2-letter-spacing);
+  max-width: 26rem;
+}
+
+/* The input + button now render as one pill via FormInput's `pill`
+   variant (button passed as its `action` slot) — this wrapper no longer
+   needs to lay out 2 separate top-level children. */
+.form {
+  position: relative;
+  z-index: 1;
+  max-width: 24rem;
+}
+
+.cardAction {
+  position: relative;
+  z-index: 1;
+}

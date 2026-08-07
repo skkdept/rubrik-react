@@ -2,8 +2,8 @@ import { useRef } from "react";
 import { Container } from "../../layout/Container/Container";
 import { useScrollReveal } from "../../../lib/useScrollReveal";
 import { STAT_CARDS, type StatCard } from "../../../data/statCards";
-import statCardAi from "../../../assets/stat-card-ai.png";
-import statCardSaas from "../../../assets/stat-card-saas.png";
+import statCardAi from "../../../assets/stat-card-ai.webp";
+import statCardSaas from "../../../assets/stat-card-saas.webp";
 import styles from "./StatCardGrid.module.css";
 
 // The source itself reuses a single photo across every "wide" card slot —
@@ -14,7 +14,7 @@ function StatCardFigure({ card, image }: { card: Omit<StatCard, "image" | "alt">
   const cardClass = card.layout === "tall" ? `${styles.card} ${styles.tall}` : `${styles.card} ${styles.wide}`;
   return (
     <figure className={cardClass}>
-      <img className={styles.image} src={image} alt="" />
+      <img className={styles.image} src={image} alt="" loading="lazy" decoding="async" />
       <figcaption className={styles.content}>
         <span className={styles.chip}>{card.chip}</span>
         <div className={styles.statContainer}>

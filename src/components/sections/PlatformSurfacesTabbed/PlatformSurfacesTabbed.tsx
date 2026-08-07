@@ -4,7 +4,7 @@ import {
   PLATFORM_SURFACES_HEADING,
 } from "../../../data/platformSurfaces";
 import { useScrollReveal } from "../../../lib/useScrollReveal";
-import dataCenterImage from "../../../assets/data-center.png";
+import dataCenterImage from "../../../assets/data-center.webp";
 import styles from "./PlatformSurfacesTabbed.module.css";
 
 function ArrowRightIcon() {
@@ -136,7 +136,7 @@ export function PlatformSurfacesTabbed() {
           </div>
 
           <div className={styles.panelImage}>
-            <img src={dataCenterImage} alt="" />
+            <img src={dataCenterImage} alt="" loading="lazy" decoding="async" />
             <div className={styles.playAvatarStack}>
               <div className={styles.playCircle} aria-hidden="true">
                 <PlayIcon />

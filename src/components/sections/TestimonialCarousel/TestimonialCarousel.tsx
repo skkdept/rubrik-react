@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { TESTIMONIALS } from "../../../data/testimonials";
 import { RubrikMark } from "../../ui/RubrikMark/RubrikMark";
 import { useScrollReveal } from "../../../lib/useScrollReveal";
-import headshot from "../../../assets/testimonial-headshot.png";
+import headshot from "../../../assets/testimonial-headshot.webp";
 import styles from "./TestimonialCarousel.module.css";
 
 function Badge() {
@@ -40,7 +40,7 @@ export function TestimonialCarousel() {
         {TESTIMONIALS.map((t) => (
           <div className={styles.mobileCard} key={t.id}>
             <div className={styles.mobilePhoto}>
-              <img src={headshot} alt="" />
+              <img src={headshot} alt="" loading="lazy" decoding="async" />
               <Badge />
             </div>
             <div className={styles.mobileBody}>
@@ -81,7 +81,7 @@ export function TestimonialCarousel() {
               <span className={styles.desktopCardShell}>
                 <span className={styles.desktopCardInner}>
                   <span className={styles.photoStrip}>
-                    <img src={headshot} alt="" style={{ left: t.imageOffset }} />
+                    <img src={headshot} alt="" style={{ left: t.imageOffset }} loading="lazy" decoding="async" />
                     <Badge />
                   </span>
 
