@@ -21,20 +21,36 @@ function parseStat(stat: string): { target: number; suffix: string } {
   return { target: Number(match[1]), suffix: match[2] };
 }
 
-function StatCardFigure({
-  card,
-  image,
-  countUpTrigger,
-}: {
-  card: Omit<StatCard, "image" | "alt">;
-  image: string;
-  countUpTrigger: boolean;
-}) {
+function StatCardFigure({ card, image }: { card: Omit<StatCard, "image" | "alt">; image: string }) {
   const cardClass = card.layout === "tall" ? `${styles.card} ${styles.tall}` : `${styles.card} ${styles.wide}`;
   const { target, suffix } = parseStat(card.stat);
-  const value = useCountUp(target, countUpTrigger);
+
+  // Each card observes its OWN visibility rather than sharing one grid-wide
+  // trigger. A shared trigger synced desktop's 2-column masonry nicely, but
+  // broke mobile: below 768px this grid collapses to a single column (see
+  // StatCardGrid.module.css), so all 5 cards stack across a column much
+  // taller than any viewport — a trigger fired once near its top animated
+  // every counter simultaneously, so cards further down had already
+  // finished by the time they were actually scrolled into view (only the
+  // first was ever seen mid-count). Per-card observation means each one
+  // starts exactly as it individually arrives, correct on any layout. See
+  // ASSUMPTIONS.md.
+  const cardRef = useRef<HTMLElement>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = cardRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver((entries) => setInView(entries[0].isIntersecting), {
+      threshold: 0.1,
+      rootMargin: "0px 0px -5% 0px",
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const value = useCountUp(target, inView);
   return (
-    <figure className={cardClass}>
+    <figure className={cardClass} ref={cardRef}>
       <img className={styles.image} src={image} alt="" loading="lazy" decoding="async" />
       <figcaption className={styles.content}>
         <span className={styles.chip}>{card.chip}</span>
@@ -59,48 +75,19 @@ export function StatCardGrid() {
   const left = [first, rest[0]];
   const right = rest.slice(1);
 
-  // One shared trigger for every card's count-up, based on the grid as a
-  // whole entering view — not each card's own position. The grid is a
-  // 2-column masonry (tall AI card + short SaaS below it vs. 3 even wide
-  // cards), so a card sitting beneath a taller neighbor can be pushed
-  // several hundred px lower on the page than its row-mates; counting up
-  // independently per-card made those specific cards visibly lag behind
-  // the others during a normal scroll. See ASSUMPTIONS.md.
-  const gridRef = useRef<HTMLDivElement>(null);
-  const [countUpTrigger, setCountUpTrigger] = useState(false);
-
-  useEffect(() => {
-    const el = gridRef.current;
-    if (!el) return;
-    // Keeps observing (doesn't disconnect after the first fire) so
-    // `countUpTrigger` tracks intersection continuously — see
-    // useCountUp's own doc comment for why replaying on re-entry matters.
-    const observer = new IntersectionObserver(
-      (entries) => setCountUpTrigger(entries[0].isIntersecting),
-      { threshold: 0.1, rootMargin: "0px 0px -5% 0px" }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
   return (
     <section className={styles.section} ref={sectionRef}>
       <h2 className="sr-only">Rubrik by the numbers</h2>
       <Container>
-        <div className={styles.grid} ref={gridRef}>
+        <div className={styles.grid}>
           <div className={styles.column}>
             {left.map((card, i) => (
-              <StatCardFigure card={card} image={IMAGES[i]} countUpTrigger={countUpTrigger} key={card.chip + card.stat} />
+              <StatCardFigure card={card} image={IMAGES[i]} key={card.chip + card.stat} />
             ))}
           </div>
           <div className={styles.column}>
             {right.map((card, i) => (
-              <StatCardFigure
-                card={card}
-                image={IMAGES[i + 2]}
-                countUpTrigger={countUpTrigger}
-                key={card.chip + card.stat}
-              />
+              <StatCardFigure card={card} image={IMAGES[i + 2]} key={card.chip + card.stat} />
             ))}
           </div>
         </div>
