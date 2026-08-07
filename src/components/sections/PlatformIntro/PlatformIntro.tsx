@@ -5,7 +5,7 @@ import styles from "./PlatformIntro.module.css";
 
 function PlusMark({ style }: { style: React.CSSProperties }) {
   return (
-    <svg className={styles.plusMark} style={style} viewBox="0 0 11.6211 11.6211" aria-hidden="true">
+    <svg className={styles.plusMark} style={style} viewBox="0 0 11.6211 11.6211" aria-hidden="true" data-reveal>
       <path d="M6.3916 5.22949H11.6211V6.3916H6.3916V11.6211H5.22949V6.3916H0V5.22949H5.22949V0H6.3916V5.22949Z" />
     </svg>
   );

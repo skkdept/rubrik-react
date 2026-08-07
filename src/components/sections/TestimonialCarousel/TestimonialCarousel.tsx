@@ -20,6 +20,10 @@ export function TestimonialCarousel() {
   const sectionRef = useRef<HTMLElement>(null);
   useScrollReveal(sectionRef);
 
+  const mobileListRef = useRef<HTMLDivElement>(null);
+  const [mobileIndex, setMobileIndex] = useState(0);
+  const mobileTickingRef = useRef(false);
+
   useEffect(() => () => {
     if (idleRef.current) clearTimeout(idleRef.current);
   }, []);
@@ -33,33 +37,94 @@ export function TestimonialCarousel() {
     idleRef.current = setTimeout(() => setActiveIndex(0), 180);
   };
 
+  // One full-width slide per card (scroll-snap), so the current slide index
+  // is just scroll position / slide width — simpler and more robust than
+  // hand-rolled touch handling, and gets native swipe gestures for free.
+  const updateMobileIndex = () => {
+    const el = mobileListRef.current;
+    if (!el || el.clientWidth === 0) return;
+    setMobileIndex(Math.round(el.scrollLeft / el.clientWidth));
+  };
+
+  const handleMobileScroll = () => {
+    if (mobileTickingRef.current) return;
+    mobileTickingRef.current = true;
+    requestAnimationFrame(() => {
+      mobileTickingRef.current = false;
+      updateMobileIndex();
+    });
+  };
+
+  // A transient scroll event can fire while layout is still settling (e.g.
+  // lazy images reflowing as they load in), computing a wrong index from a
+  // since-corrected scroll position with no further scroll event to fix it.
+  // A ResizeObserver on the list itself recomputes whenever its size
+  // actually changes — covers initial layout settling, later reflows, and
+  // viewport resizes/rotation, not just a single mount-time snapshot.
+  useEffect(() => {
+    const el = mobileListRef.current;
+    if (!el) return;
+    updateMobileIndex();
+    const observer = new ResizeObserver(updateMobileIndex);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const scrollToMobileIndex = (i: number) => {
+    const el = mobileListRef.current;
+    if (!el) return;
+    el.scrollTo({ left: i * el.clientWidth, behavior: "smooth" });
+  };
+
   return (
     <section ref={sectionRef} className={styles.section} aria-label="Customer stories">
-      {/* Mobile/tablet: static stacked cards, fully expanded */}
-      <div className={styles.mobileList}>
+      {/* Mobile/tablet: one card per swipeable slide, dot pagination below */}
+      <div
+        className={styles.mobileList}
+        ref={mobileListRef}
+        onScroll={handleMobileScroll}
+        role="group"
+        aria-roledescription="carousel"
+        aria-label="Customer stories"
+      >
         {TESTIMONIALS.map((t) => (
           <div className={styles.mobileCard} key={t.id}>
-            <div className={styles.mobilePhoto}>
-              <img src={headshot} alt="" loading="lazy" decoding="async" />
-              <Badge />
-            </div>
-            <div className={styles.mobileBody}>
-              <p className={styles.stat} data-reveal>
-                {t.stat}
-              </p>
-              <p className={styles.quote} data-reveal>
-                &ldquo;{t.quote}&rdquo;
-              </p>
-              <div className={styles.byline}>
-                <p className={styles.name} data-reveal>
-                  {t.name}
+            <div className={styles.mobileCardInner}>
+              <div className={styles.mobilePhoto}>
+                <img src={headshot} alt="" loading="lazy" decoding="async" />
+                <Badge />
+              </div>
+              <div className={styles.mobileBody}>
+                <p className={styles.stat} data-reveal>
+                  {t.stat}
                 </p>
-                <p className={styles.role} data-reveal>
-                  {t.role}
+                <p className={styles.quote} data-reveal>
+                  &ldquo;{t.quote}&rdquo;
                 </p>
+                <div className={styles.byline}>
+                  <p className={styles.name} data-reveal>
+                    {t.name}
+                  </p>
+                  <p className={styles.role} data-reveal>
+                    {t.role}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
+        ))}
+      </div>
+
+      <div className={styles.mobileDots}>
+        {TESTIMONIALS.map((t, i) => (
+          <button
+            key={t.id}
+            type="button"
+            className={i === mobileIndex ? `${styles.mobileDot} ${styles.mobileDotActive}` : styles.mobileDot}
+            aria-label={`Show testimonial from ${t.name}`}
+            aria-current={i === mobileIndex}
+            onClick={() => scrollToMobileIndex(i)}
+          />
         ))}
       </div>
 

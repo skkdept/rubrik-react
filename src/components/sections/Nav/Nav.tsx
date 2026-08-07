@@ -2,6 +2,7 @@ import { useEffect, useId, useState } from "react";
 import { CtaButton } from "../../ui/CtaButton/CtaButton";
 import { FormInput } from "../../ui/FormInput/FormInput";
 import { RubrikLogotype } from "../../ui/RubrikMark/RubrikLogotype";
+import { useScrolled } from "../../../lib/useScrolled";
 import styles from "./Nav.module.css";
 
 const PRIMARY_LINKS = ["Products", "Solutions", "Knowledge Hub"];
@@ -127,6 +128,7 @@ export function Nav() {
   const [query, setQuery] = useState("");
   const panelId = useId();
   const searchExpanded = query.length > SEARCH_EXPAND_LENGTH;
+  const scrolled = useScrolled(8);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -138,7 +140,7 @@ export function Nav() {
   }, [menuOpen]);
 
   return (
-    <header className={styles.header}>
+    <header className={scrolled ? `${styles.header} ${styles.headerScrolled}` : styles.header}>
       <div className={styles.bar}>
         <div className={styles.primaryGroup}>
           <a className={styles.logo} href="/">

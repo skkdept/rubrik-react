@@ -142,13 +142,9 @@ export function PlatformSurfacesTabbed() {
                 <PlayIcon />
               </div>
             </div>
-            <div className={styles.panelStatBox}>
-              <p className={styles.panelStatValue} data-reveal>
-                {card.stat}
-              </p>
-              <p className={styles.panelStatLabel} data-reveal>
-                {card.statLabel}
-              </p>
+            <div className={styles.panelStatBox} data-reveal>
+              <p className={styles.panelStatValue}>{card.stat}</p>
+              <p className={styles.panelStatLabel}>{card.statLabel}</p>
             </div>
           </div>
         </div>

@@ -4,19 +4,64 @@
   padding-block: var(--primitive-spacing-9);
 }
 
-/* ── Mobile: static stacked cards ── */
+/* ── Mobile: one card per swipeable slide (native scroll-snap, not
+   hand-rolled touch handling) plus dot pagination below ── */
 .mobileList {
   display: flex;
-  flex-direction: column;
-  gap: var(--primitive-spacing-4);
-  padding-inline: var(--primitive-spacing-4);
+  flex-direction: row;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.mobileList::-webkit-scrollbar {
+  display: none;
 }
 
 .mobileCard {
+  flex: 0 0 100%;
+  width: 100%;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  padding-inline: var(--primitive-spacing-4);
+  box-sizing: border-box;
+}
+
+.mobileCardInner {
   background: var(--semantic-color-bg-surface-dark);
   border-radius: var(--primitive-radius-lg);
   border: 1px solid var(--semantic-color-border-teal);
   overflow: hidden;
+}
+
+.mobileDots {
+  display: flex;
+  justify-content: center;
+  gap: var(--primitive-spacing-2);
+  align-items: center;
+  margin-top: var(--primitive-spacing-5);
+}
+
+.mobileDot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: none;
+  border-radius: var(--primitive-radius-full);
+  background: var(--semantic-color-border-teal);
+  transition: all 400ms cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.mobileDotActive {
+  width: 24px;
+  background: var(--primitive-color-teal-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobileDot {
+    transition: none;
+  }
 }
 
 .mobilePhoto {
@@ -113,6 +158,10 @@
 
 @media (min-width: 1200px) {
   .mobileList {
+    display: none;
+  }
+
+  .mobileDots {
     display: none;
   }
 

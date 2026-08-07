@@ -1,26 +1,63 @@
-/* Single flat row — never wraps at any width, matching the source (no
-   flex-wrap in its desktop markup, and an explicit overflow-x: auto
-   override for mobile/tablet rather than wrapping onto multiple lines).
-   Scrolls horizontally whenever the natural row width exceeds the
-   viewport, which in practice is every width below where 15 marks +
-   dividers + gaps fit — not just a fixed mobile/tablet breakpoint. */
-.strip {
+.viewport {
+  overflow: hidden;
+  background: var(--semantic-color-bg-surface);
+}
+
+/* Continuous marquee: two back-to-back copies of the same sequence, looped
+   via translateX(-50%) — see LogoStrip.tsx for why that's seamless. Speed
+   is duration-based, not viewport-based, since the content's own width
+   doesn't change per breakpoint (same 15 marks always) — a fixed duration
+   gives a fixed, consistent px/s speed everywhere. Paused on hover/focus. */
+.track {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  width: max-content;
+  gap: var(--primitive-spacing-6); /* 24px, per source (within-group) */
+  padding: var(--primitive-spacing-4) var(--primitive-spacing-6);
+  animation: logoMarquee 36s linear infinite;
+}
+
+.track:hover,
+.track:focus-within {
+  animation-play-state: paused;
+}
+
+@keyframes logoMarquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (min-width: 1200px) {
+  .track {
+    height: 3.5rem; /* 56px, per source */
+    padding-inline: 3.5rem; /* 56px, per source */
+  }
+}
+
+/* prefers-reduced-motion fallback: original single-copy, manually
+   scrollable row (see LogoStrip.tsx) — no animation, so no duplicate copy
+   is rendered either. */
+.staticStrip {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
   justify-content: flex-start;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  gap: var(--primitive-spacing-6); /* 24px, per source (within-group) */
-  background: var(--semantic-color-bg-surface);
+  gap: var(--primitive-spacing-6);
   padding: var(--primitive-spacing-4) var(--primitive-spacing-6);
 }
 
 @media (min-width: 1200px) {
-  .strip {
-    height: 3.5rem; /* 56px, per source */
-    padding-inline: 3.5rem; /* 56px, per source */
-    justify-content: center; /* fits without scrolling at this width, per source */
+  .staticStrip {
+    height: 3.5rem;
+    padding-inline: 3.5rem;
+    justify-content: center;
   }
 }
 
