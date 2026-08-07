@@ -3,10 +3,9 @@ import { HeroSection } from "./components/sections/HeroSection/HeroSection";
 import { LogoStrip } from "./components/sections/LogoStrip/LogoStrip";
 import { PlatformIntro } from "./components/sections/PlatformIntro/PlatformIntro";
 import { StatCardGrid } from "./components/sections/StatCardGrid/StatCardGrid";
-// Temporarily hidden, see below.
-// import { PlatformSurfacesStacked } from "./components/sections/PlatformSurfacesStacked/PlatformSurfacesStacked";
-// import { PlatformSurfacesTabbed } from "./components/sections/PlatformSurfacesTabbed/PlatformSurfacesTabbed";
-// import { TestimonialCarousel } from "./components/sections/TestimonialCarousel/TestimonialCarousel";
+import { PlatformSurfacesStacked } from "./components/sections/PlatformSurfacesStacked/PlatformSurfacesStacked";
+import { PlatformSurfacesTabbed } from "./components/sections/PlatformSurfacesTabbed/PlatformSurfacesTabbed";
+import { TestimonialCarousel } from "./components/sections/TestimonialCarousel/TestimonialCarousel";
 import { FaqSection } from "./components/sections/FaqSection/FaqSection";
 import { Teaser50 } from "./components/sections/Teaser50/Teaser50";
 import { Teaser100 } from "./components/sections/Teaser100/Teaser100";
@@ -38,10 +37,9 @@ export default function App() {
         <LogoStrip />
         <PlatformIntro />
         <StatCardGrid />
-        {/* Temporarily hidden for review. */}
-        {/* <PlatformSurfacesStacked /> */}
-        {/* <PlatformSurfacesTabbed /> */}
-        {/* <TestimonialCarousel /> */}
+        <PlatformSurfacesStacked />
+        <PlatformSurfacesTabbed />
+        <TestimonialCarousel />
         <Teaser50 />
         <FaqSection />
         <Teaser100 />
