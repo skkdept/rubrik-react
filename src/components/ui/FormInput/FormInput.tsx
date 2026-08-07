@@ -9,7 +9,9 @@ interface FormInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "cl
   action?: ReactNode;
   /** Leading slot, e.g. a search/sparkle icon. */
   icon?: ReactNode;
-  variant?: "default" | "dark";
+  variant?: "default" | "dark" | "pill";
+  /** Scoped override hook for the outer wrapper, e.g. per-instance sizing. */
+  className?: string;
 }
 
 /** Shared text/email/search input, with optional leading icon and trailing action button. */
@@ -20,10 +22,14 @@ export function FormInput({
   action,
   icon,
   variant = "default",
+  className,
   ...inputProps
 }: FormInputProps) {
+  const fieldClasses = [styles.field, variant !== "default" && styles[variant], className]
+    .filter(Boolean)
+    .join(" ");
   return (
-    <div className={variant === "dark" ? `${styles.field} ${styles.dark}` : styles.field}>
+    <div className={fieldClasses}>
       <label htmlFor={id} className={visibleLabel ? styles.label : styles.visuallyHiddenLabel}>
         {label}
       </label>

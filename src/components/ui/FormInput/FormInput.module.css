@@ -87,3 +87,22 @@
 .dark .label {
   color: var(--semantic-color-fg-on-dark);
 }
+
+/* Pill variant: the CTA banner's inline "email input + attached button"
+   pattern — one seamless rounded-full white pill with a soft drop-shadow
+   instead of a border, per source (both the dark-card form's Container17
+   and the full-width banner's Container18 use this exact treatment: bg
+   white, `rounded-[14029546px]` = fully round, drop-shadow, no border,
+   4px/4px/4px/16px padding so the trailing button sits nearly flush with
+   the pill's own edge). Used by both CtaBanner and CtaBannerFull. */
+.pill .inputRow {
+  background: var(--primitive-color-white);
+  border: none;
+  border-radius: var(--primitive-radius-full);
+  box-shadow: 0 16.725px 25.087px rgba(0, 0, 0, 0.4);
+  padding: 0.25rem 0.25rem 0.25rem 1rem; /* 4px 4px 4px 16px, per source */
+}
+
+.pill .input {
+  color: var(--semantic-color-fg-primary);
+}

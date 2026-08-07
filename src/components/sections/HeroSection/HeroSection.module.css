@@ -6,11 +6,17 @@
   padding-block: var(--primitive-spacing-11); /* 80px, per Guidelines.md Hero (80px) */
 }
 
+/* No CSS opacity here — `hero-background.png` already carries the source's
+   "opacity-38" baked into its own alpha channel (confirmed via canvas pixel
+   readback: every pixel decodes to alpha ~97/255 ≈ 0.38, not 255). An
+   earlier pass also applied `opacity: 0.38` here on top of that, which
+   double-dimmed the photo to ~0.38×0.38≈0.14 instead of 0.38 — the actual
+   root cause of the whole background reading as washed-out, not the veil
+   math (which was already correct). See ASSUMPTIONS.md. */
 .backgroundArt {
   position: absolute;
   inset: 0;
   z-index: 0;
-  opacity: 0.5;
   pointer-events: none;
 }
 
@@ -18,6 +24,37 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* NOT a flat full-bleed overlay — the user supplied Figma's own Dev Mode
+   code export for this exact node, which gives the veil as a 1126x1351
+   rect at left:1402/top:37, `rotate(90deg)` with an EXPLICIT
+   `transform-origin: top left` (unlike the earlier `hero-source.html` CSS
+   dump, which never stated an origin and was reverse-engineered assuming
+   the CSS default of `center`). Resolving that transform: a point at local
+   offset (dx,dy) maps to (-dy,dx) about the origin, so the rect's actual
+   on-screen bounding box is x:[51,1402], y:[37,1163] inside the 1447x1383
+   frame — i.e. ~3.5% left / ~3.1% right / ~2.7% top inset, extending down
+   to ~84% of frame height (bottom ~16% uncovered, but that's where the
+   opaque media placeholder sits in both this design and our own fluid
+   layout, so it's covered regardless and simplified here to `bottom: 0`).
+   Verified this is real, not another export artifact: scanned the actual
+   Figma render pixel-by-pixel across all three edges and found a sharp
+   alpha step at each predicted boundary (e.g. left edge: ~0.24 alpha at
+   fx=0.03 dropping to ~0.09 at fx=0.04 — a real discontinuity, not sampling
+   noise). The previous flat `inset: 0` veil (see ASSUMPTIONS.md #61) was
+   wrong; its own pixel-sampling pass never sampled close enough to these
+   edges to catch the step, and the "vivid corners" it dismissed as a
+   misreading were this exact effect. */
+.backgroundVeil {
+  position: absolute;
+  top: 2.68%;
+  left: 3.52%;
+  right: 3.11%;
+  bottom: 0;
+  z-index: 0;
+  background: rgba(255, 255, 255, 0.66);
+  pointer-events: none;
 }
 
 /* Fine technical grid overlay on the earth photo. The source's version of
@@ -179,13 +216,16 @@
   }
 }
 
+/* Per the source's "Rubrik Agent Cloud" layer (Body/Base style): plain
+   16px/400/ink text, not the mono all-caps brand label this was built as —
+   there's no dedicated "eyebrow" style here, just body copy sitting above
+   the headline. See ASSUMPTIONS.md. */
 .kicker {
-  font-family: var(--semantic-font-label);
-  font-size: var(--semantic-text-label-mono-size);
-  font-weight: var(--semantic-text-label-mono-weight);
-  letter-spacing: var(--semantic-text-label-mono-letter-spacing);
-  text-transform: uppercase;
-  color: var(--semantic-color-fg-brand);
+  font-family: var(--semantic-font-functional);
+  font-size: var(--semantic-text-body-base-size);
+  font-weight: var(--semantic-text-body-base-weight);
+  line-height: var(--semantic-text-body-base-line-height);
+  color: var(--semantic-color-fg-primary);
 }
 
 .headline {
@@ -197,11 +237,16 @@
   letter-spacing: var(--semantic-text-display-hero-letter-spacing);
 }
 
+/* Per the source's "Body/Large Serif" style ('Tiempos Text', regular
+   weight, full-ink color) — the same serif body treatment already used in
+   PlatformIntro/FaqSection/StatCardGrid; the Hero subtitle was still on the
+   sans/secondary-gray combo instead. See ASSUMPTIONS.md. */
 .subtitle {
-  font-family: var(--semantic-font-functional);
+  font-family: var(--semantic-font-narrative);
+  font-weight: var(--semantic-text-body-lg-weight-serif);
   font-size: var(--semantic-text-body-lg-size);
   line-height: var(--semantic-text-body-lg-line-height);
-  color: var(--semantic-color-fg-secondary);
+  color: var(--semantic-color-fg-primary);
   max-width: 34rem;
 }
 
@@ -212,26 +257,6 @@
   justify-content: center;
   gap: var(--primitive-spacing-3);
   width: 100%;
-}
-
-.searchBar {
-  width: 100%;
-  max-width: 32rem;
-}
-
-.askButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--primitive-spacing-2) var(--primitive-spacing-5);
-  background: var(--semantic-color-cta-primary-bg);
-  color: var(--semantic-color-cta-primary-fg);
-  border: none;
-  border-radius: var(--primitive-radius-md);
-  font-family: var(--semantic-font-functional);
-  font-weight: var(--semantic-text-ui-button-weight);
-  font-size: var(--semantic-text-ui-button-size);
-  text-transform: uppercase;
 }
 
 /* Empty product-screenshot slot — never filled in the source design either.

@@ -64,13 +64,30 @@
   padding: var(--primitive-spacing-4);
 }
 
+/* Styled as a Secondary/Medium CTA button, per the Figma component spec
+   (confirmed by the user against the design file, not the rendered old
+   site — the live old site's coded "AI"/"SaaS" text has no box styling at
+   all, apparently an export bug that dropped it, same pattern as several
+   other Figma-export gaps found this session). Reuses the same secondary
+   CTA tokens as CtaButton for bg/border/text color so both stay in sync.
+   Not an actual CtaButton instance: this label has no destination to link
+   to, so it stays a plain <span> rather than an inert, non-functional
+   button/link element. No fixed width — content-sized via padding, since
+   chip text length varies a lot ("AI" vs "Cyber Resilience") and the
+   spec's 144x42px was just that one instance's measurement. See
+   ASSUMPTIONS.md. */
 .chip {
   align-self: flex-start;
-  border: 1px solid var(--semantic-color-fg-primary);
-  padding: var(--primitive-spacing-4);
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.25rem; /* 12px 20px, per source */
+  background: var(--semantic-color-cta-secondary-bg);
+  border: 1px solid var(--semantic-color-cta-secondary-border);
   font-family: var(--semantic-font-functional);
-  font-size: var(--semantic-text-body-sm-size);
-  color: var(--semantic-color-fg-primary);
+  font-weight: var(--primitive-font-weight-medium);
+  font-size: var(--semantic-text-ui-button-size); /* 14px, per source */
+  line-height: 1.125rem; /* 18px, per source */
+  color: var(--semantic-color-cta-secondary-fg);
   white-space: nowrap;
 }
 

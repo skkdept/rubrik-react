@@ -76,13 +76,20 @@
 .accent {
   background: var(--semantic-color-cta-accent-bg);
   color: var(--semantic-color-cta-accent-fg);
+  border-color: var(--semantic-color-cta-accent-fg);
 }
 .accent:hover:not(:disabled) {
   background: var(--primitive-color-teal-light);
 }
 
 /* Dark: content-heavy/editorial sections. No radius here — it's controlled
-   entirely by size (see note above), not variant. */
+   entirely by size (see note above), not variant. Typography is the one
+   place Dark doesn't follow the "size controls everything" rule: per the
+   Figma component spec, Dark's Large uses the same 14px/regular-weight
+   label as its Medium (not Large's usual 16px/500), and its Large padding
+   is 14px/20px instead of the other 3 variants' 14px/24px — no live Dark
+   button exists on the homepage to cross-check, so this rests on the
+   Figma spec alone. See ASSUMPTIONS.md. */
 .dark {
   background: var(--semantic-color-cta-dark-bg);
   color: var(--semantic-color-cta-dark-fg);
@@ -90,4 +97,14 @@
 }
 .dark:hover:not(:disabled) {
   background: var(--primitive-color-text-secondary);
+}
+
+.dark.large,
+.dark.medium {
+  font-weight: var(--primitive-font-weight-regular);
+}
+
+.dark.large {
+  padding: 14px 20px;
+  font-size: var(--semantic-text-ui-button-size); /* 14px, matches Dark Medium */
 }

@@ -1,3 +1,12 @@
+/* Per source (`HomePage/index.tsx:20117`, `data-name="CTA Section"`): this
+   frame is exactly `w-[1441px]` with no page-margin classes at all — the
+   two cards (650px + 694px + 24px gap) sit centered with only ~36px of
+   slack per side, well under the ~64/80px inset every other section routes
+   through Container/`--semantic-layout-margin`. This section owns its own
+   (narrower) padding directly instead of wrapping content in the shared
+   Container — same pattern as FaqSection/PlatformIntro — so the cards read
+   as noticeably wider/closer to full-bleed than the rest of the page's
+   content column. See ASSUMPTIONS.md. */
 .section {
   width: 100%;
   background: var(--semantic-color-bg-surface);
@@ -6,7 +15,7 @@
 
 @media (min-width: 1200px) {
   .section {
-    padding: var(--primitive-spacing-9) var(--semantic-layout-margin);
+    padding: var(--primitive-spacing-9) var(--primitive-spacing-8);
   }
 }
 
@@ -71,17 +80,13 @@
   max-width: 26rem;
 }
 
+/* The input + button now render as one pill via FormInput's `pill`
+   variant (button passed as its `action` slot) — this wrapper no longer
+   needs to lay out 2 separate top-level children. */
 .form {
   position: relative;
   z-index: 1;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--primitive-spacing-3);
-  align-items: flex-end;
-}
-
-.form > :first-child {
-  flex: 1 1 12rem;
+  max-width: 24rem;
 }
 
 .cardAction {

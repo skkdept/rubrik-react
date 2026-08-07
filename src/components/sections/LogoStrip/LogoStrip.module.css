@@ -1,33 +1,38 @@
+/* Single flat row — never wraps at any width, matching the source (no
+   flex-wrap in its desktop markup, and an explicit overflow-x: auto
+   override for mobile/tablet rather than wrapping onto multiple lines).
+   Scrolls horizontally whenever the natural row width exceeds the
+   viewport, which in practice is every width below where 15 marks +
+   dividers + gaps fit — not just a fixed mobile/tablet breakpoint. */
 .strip {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
-  justify-content: center;
-  gap: var(--primitive-spacing-4) var(--primitive-spacing-7);
+  justify-content: flex-start;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  gap: var(--primitive-spacing-6); /* 24px, per source (within-group) */
   background: var(--semantic-color-bg-surface);
   padding: var(--primitive-spacing-4) var(--primitive-spacing-6);
 }
 
 @media (min-width: 1200px) {
   .strip {
-    flex-wrap: nowrap;
     height: 3.5rem; /* 56px, per source */
     padding-inline: 3.5rem; /* 56px, per source */
-    gap: var(--primitive-spacing-7); /* 32px, per source */
+    justify-content: center; /* fits without scrolling at this width, per source */
   }
-}
-
-.group {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: var(--primitive-spacing-5); /* 24px, per source */
 }
 
 .mark {
   display: block;
   flex-shrink: 0;
+}
+
+/* Marks the source's group boundary (Frame41/42/43): no divider there,
+   just a wider gap. 24px base gap + 8px margin = 32px, matching source. */
+.groupStart {
+  margin-left: var(--primitive-spacing-2); /* 8px */
 }
 
 .divider {

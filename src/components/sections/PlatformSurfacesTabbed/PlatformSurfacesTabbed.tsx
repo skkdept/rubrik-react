@@ -121,11 +121,9 @@ export function PlatformSurfacesTabbed() {
               </p>
               <ul className={styles.panelFeatures}>
                 {card.features.map((feature) => (
-                  <li className={styles.panelFeature} key={feature}>
+                  <li className={styles.panelFeature} data-reveal key={feature}>
                     <span className={styles.panelFeatureDot} aria-hidden="true" />
-                    <p className={styles.panelFeatureText} data-reveal>
-                      {feature}
-                    </p>
+                    <p className={styles.panelFeatureText}>{feature}</p>
                   </li>
                 ))}
               </ul>

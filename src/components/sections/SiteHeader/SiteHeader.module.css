@@ -5,17 +5,26 @@
   border-bottom: 1px solid var(--semantic-color-border-default);
 }
 
-/* This specific button comes from the raw generated Nav markup (not a
-   hand-written component), which — like every other "FK Grotesk Mono"
-   declaration in that same generated file — falls back to the generic
-   `sans-serif` keyword, not `monospace`. The hand-written components
-   (FaqSection, TestimonialCarousel, PlatformSurfaces tabs) use the correct
-   `monospace` fallback for the same font and are unaffected — this override
-   is scoped to just this one instance rather than changing the shared
-   `--primitive-font-family-mono` token, which would wrongly flip those
-   too. See ASSUMPTIONS.md. */
+/* This button doesn't follow the shared CtaButton size/variant system at
+   all, despite using `size="small"` as its base (dark-variant color and
+   base button behavior are correct and shared; everything else here is a
+   bespoke override) — per a Figma component spec the user provided
+   directly for this exact button: 4px radius (not `.small`'s full pill),
+   700/bold weight (not 500/medium), plain 'FK Grotesk' (not Mono at all),
+   and asymmetric 16/24/12px padding. This contradicts an earlier direct
+   *live-site* measurement of this same button (which found mono/500/pill,
+   matching the shared Small size) — kept the Figma spec per this
+   project's established precedent that the Figma design wins when it
+   conflicts with the coded export (see #34/#50: the export can silently
+   drop or alter styling that the design never intended). See
+   ASSUMPTIONS.md. */
 .navCta {
-  font-family: "FK Grotesk Mono", sans-serif;
+  padding: 1rem 1.5rem 0.75rem; /* 16px 24px 12px, per source */
+  border-radius: 4px;
+  font-family: var(--semantic-font-functional);
+  font-weight: var(--primitive-font-weight-bold);
+  font-size: 0.875rem; /* 14px, per source */
+  letter-spacing: normal;
 }
 
 /* The nav uses its own fixed 24px horizontal padding and 83px height at
@@ -24,7 +33,6 @@
 .bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--primitive-spacing-6);
   width: 100%;
   max-width: var(--semantic-layout-page-width);
@@ -33,16 +41,66 @@
   padding-inline: 1.5rem; /* 24px, per source */
 }
 
-/* Two anchored groups (logo+primary links / secondary links+CTA) with a
-   deliberate gap between them, per source — not one evenly-distributed row.
-   `justify-content: space-between` on 2 children pins them to opposite
-   ends; adding a 3rd top-level child here would center it instead. */
+/* 3 groups (logo+primary links / search / secondary links+CTA). The search
+   group is `flex: 1` and centers its own content, so it fills whatever
+   space is left between the two content-sized side groups — that reads as
+   "centered in the bar" without needing `.bar` itself to be a 3-column
+   grid. Search bar moved here from the Hero; see ASSUMPTIONS.md. */
 .primaryGroup,
 .secondaryGroup {
   display: flex;
   align-items: center;
   gap: var(--primitive-spacing-4); /* 16px, per source — uniform with navList's own link gap */
   flex-shrink: 0;
+}
+
+.searchGroup {
+  display: none;
+  flex: 1 1 auto;
+  justify-content: center;
+  min-width: 0;
+}
+
+@media (min-width: 1200px) {
+  .searchGroup {
+    display: flex;
+  }
+}
+
+/* Base width plus a wider expanded state once the query outgrows it —
+   see SEARCH_EXPAND_LENGTH in SiteHeader.tsx. Transition keeps the resize
+   from being an abrupt jump while typing. Widened from an earlier 320px
+   base per feedback that it read as noticeably narrow. */
+.searchBar {
+  width: 22.5rem; /* 360px */
+  max-width: 100%;
+  transition: width 220ms ease;
+}
+
+.searchBarExpanded {
+  width: 30rem; /* 480px */
+}
+
+.mobileSearchBar {
+  width: 100%;
+}
+
+/* The shared FormInput defaults to 16px body text — a bit large sitting
+   in a compact nav bar next to 14px nav links. Scoped down rather than
+   changing the shared token, since other FormInput usages (e.g.
+   CtaBanner's email field) are a different context. */
+.navSearchField input {
+  font-size: var(--semantic-text-ui-nav-size); /* 14px */
+}
+
+/* The shared placeholder rule floors its size at 18px regardless of the
+   input's own font-size — a deliberate WCAG AA Large minimum, since the
+   placeholder's lower-contrast gray only passes contrast at 18px+. Per
+   user decision, this one instance shrinks to match the 14px input text
+   anyway, accepting it falls below AA Large contrast at this size. See
+   ASSUMPTIONS.md. */
+.navSearchField input::placeholder {
+  font-size: var(--semantic-text-ui-nav-size); /* 14px */
 }
 
 .logo {
@@ -71,6 +129,9 @@
 }
 
 .navLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--primitive-spacing-1);
   text-decoration: none;
   color: var(--semantic-color-fg-secondary);
   font-family: var(--semantic-font-functional);
@@ -79,6 +140,40 @@
 }
 
 .navLink:hover {
+  color: var(--semantic-color-fg-primary);
+}
+
+/* Visual-only dropdown affordance on Products/Solutions — no dropdown
+   panel exists yet. See ASSUMPTIONS.md. */
+.chevron {
+  width: 0.625rem;
+  height: 0.625rem;
+  flex-shrink: 0;
+}
+
+/* Language selector — decorative only, no real locale switching exists in
+   this app. Hidden below 1200px like `.navGroups`: at mobile widths, logo +
+   this + the CTA button overflowed the bar and pushed the menu toggle
+   completely off-screen (making it unreachable) — confirmed via a
+   390px-viewport check. See ASSUMPTIONS.md. */
+.langSelector {
+  display: none;
+  align-items: center;
+  gap: var(--primitive-spacing-1);
+  background: none;
+  border: none;
+  color: var(--semantic-color-fg-secondary);
+  font-family: var(--semantic-font-functional);
+  font-size: var(--semantic-text-ui-nav-size);
+  font-weight: var(--semantic-text-ui-nav-weight);
+}
+
+.langSelector svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.langSelector:hover {
   color: var(--semantic-color-fg-primary);
 }
 
@@ -119,6 +214,10 @@
 @media (min-width: 1200px) {
   .navGroups {
     display: flex;
+  }
+
+  .langSelector {
+    display: inline-flex;
   }
 
   .menuToggle {
