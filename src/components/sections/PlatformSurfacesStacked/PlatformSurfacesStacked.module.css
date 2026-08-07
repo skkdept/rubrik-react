@@ -197,12 +197,21 @@
   object-fit: cover;
 }
 
+/* Decorative column-guide lines for the desktop stacked-card layout only —
+   `CardPanel` (and these dividers with it) is reused as-is by the mobile
+   `StaticList` fallback, which has a totally different single-column
+   layout with no side-by-side image panel for them to flank. Missing
+   `display: none` here (unlike every other desktop-only rule in this file,
+   e.g. `.heading` above) let them render at their absolute `left`/`right`
+   offsets regardless of width, showing up as stray vertical lines behind
+   the mobile list's stacked text. */
 .divider {
   position: absolute;
   top: 0;
   bottom: 0;
   width: 1px;
   background: var(--semantic-color-border-teal);
+  display: none;
 }
 
 .playButton {

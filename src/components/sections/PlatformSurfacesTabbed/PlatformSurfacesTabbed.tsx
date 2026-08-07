@@ -1,4 +1,4 @@
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import {
   PLATFORM_SURFACE_CARDS,
   PLATFORM_SURFACES_HEADING,
@@ -36,6 +36,28 @@ export function PlatformSurfacesTabbed() {
   const sectionRef = useRef<HTMLElement>(null);
   useScrollReveal(sectionRef);
   const card = PLATFORM_SURFACE_CARDS[active];
+
+  // Gates the panel's fade-in (see PlatformSurfacesTabbed.module.css) so the
+  // very first panel — mounted as part of the initial page render, usually
+  // well below the fold — doesn't play and finish its entrance off-screen
+  // before the user ever scrolls to it. By the time any tab is clicked the
+  // section is necessarily already in view, so this is already true and
+  // every subsequent switch animates immediately as before.
+  const [hasEnteredView, setHasEnteredView] = useState(false);
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries[0].isIntersecting) return;
+        setHasEnteredView(true);
+        observer.disconnect();
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -5% 0px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const focusTab = (index: number) => {
     const wrapped = (index + PLATFORM_SURFACE_CARDS.length) % PLATFORM_SURFACE_CARDS.length;
@@ -108,7 +130,7 @@ export function PlatformSurfacesTabbed() {
         id={`${baseId}-panel-${active}`}
         aria-labelledby={`${baseId}-tab-${active}`}
         tabIndex={0}
-        className={styles.panelWrap}
+        className={hasEnteredView ? `${styles.panelWrap} ${styles.panelWrapAnimated}` : styles.panelWrap}
       >
         <div className={styles.panel}>
           <div className={styles.panelText}>

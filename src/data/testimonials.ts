@@ -21,7 +21,7 @@ export const TESTIMONIALS: Testimonial[] = [
   {
     id: 1,
     stat: "73%",
-    quote: "Recovery in minutes instead of weeks — Rubrik transformed how we think about resilience.",
+    quote: "Recovery in minutes instead of weeks. Rubrik transformed how we think about resilience.",
     name: "James Harrington",
     role: "CISO, Global FinTech Corp",
     imageOffset: "-70%",

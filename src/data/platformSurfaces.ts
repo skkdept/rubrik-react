@@ -19,13 +19,13 @@ export const PLATFORM_SURFACE_CARDS: PlatformSurfaceCard[] = [
     category: "DATA SECURITY",
     title: "Air-gapped, immutable, recoverable to a clean state.",
     description:
-      "Protect, monitor, and recover every data set across cloud, on-prem, and SaaS — with preemptive recovery and autonomous restoration ensuring you're ready before an attack lands.",
+      "Protect, monitor, and recover every data set across cloud, on-prem, and SaaS, with preemptive recovery and autonomous restoration ensuring you're ready before an attack lands.",
     stat: "73%",
     statLabel: "Recovery in minutes instead of weeks",
     features: [
       "Pre-calculate clean recovery points before attacks happen",
       "Immutable backups attackers can't encrypt or delete",
-      "Rebuild applications and IDPs automatically — no runbooks, no manual intervention",
+      "Rebuild applications and IDPs automatically: no runbooks, no manual intervention",
       "Minimum Viable Business restored in minutes, not weeks",
     ],
   },
@@ -34,7 +34,7 @@ export const PLATFORM_SURFACE_CARDS: PlatformSurfaceCard[] = [
     category: "THREAT DETECTION",
     title: "Real-time threat intelligence across your entire estate.",
     description:
-      "Monitor every endpoint, workload, and data flow with continuous threat detection — identifying ransomware, insider threats, and zero-day exploits before they cause damage.",
+      "Monitor every endpoint, workload, and data flow with continuous threat detection, identifying ransomware, insider threats, and zero-day exploits before they cause damage.",
     stat: "99.9%",
     statLabel: "Threat detection accuracy with AI-powered analysis",
     features: [
@@ -49,7 +49,7 @@ export const PLATFORM_SURFACE_CARDS: PlatformSurfaceCard[] = [
     category: "COMPLIANCE",
     title: "Audit-ready compliance without the manual overhead.",
     description:
-      "Maintain continuous compliance across HIPAA, SOC 2, GDPR, and more — with automated evidence collection and real-time policy enforcement across every data source.",
+      "Maintain continuous compliance across HIPAA, SOC 2, GDPR, and more, with automated evidence collection and real-time policy enforcement across every data source.",
     stat: "80%",
     statLabel: "Reduction in audit preparation time",
     features: [
