@@ -4,7 +4,9 @@ import {
   PLATFORM_SURFACES_HEADING,
 } from "../../../data/platformSurfaces";
 import { useScrollReveal } from "../../../lib/useScrollReveal";
+import { usePrefersReducedMotion } from "../../../lib/usePrefersReducedMotion";
 import dataCenterImage from "../../../assets/data-center.webp";
+import carharttVideo from "../../../assets/carhartt-snippet.mp4";
 import styles from "./PlatformSurfacesTabbed.module.css";
 
 function ArrowRightIcon() {
@@ -26,6 +28,67 @@ function PlayIcon() {
     <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
       <path d="M6.5 4.5v11l9-5.5-9-5.5Z" fill="#12201F" />
     </svg>
+  );
+}
+
+/**
+ * A single video (a Carhartt customer story clip) stands in for every
+ * card's play button for now — there's no per-category video content yet,
+ * so this isn't wired through `platformSurfaces` data. Lives in its own
+ * component (rather than inline) so its `playing` state resets whenever
+ * the parent's `key={active}` remounts it on tab switch, instead of
+ * carrying a played video over to a different, unrelated card.
+ *
+ * Autoplays muted (browsers block unmuted autoplay without a user gesture
+ * — `controls` stays on so the user can unmute or pause). The `muted`/
+ * `autoPlay` JSX props alone weren't reliably enough for Chromium to
+ * actually start playback on mount (the element ends up in the document
+ * with both set, `readyState` fully loaded, yet still paused) — calling
+ * `.play()` imperatively once the element exists is the version that
+ * actually plays. Under prefers-reduced-motion it starts on the static
+ * thumbnail instead, requiring an explicit click, consistent with every
+ * other autoplaying animation on this site.
+ */
+function TabPanelImage({ stat, statLabel }: { stat: string; statLabel: string }) {
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const [playing, setPlaying] = useState(!prefersReducedMotion);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!playing || !video) return;
+    video.muted = true;
+    video.play().catch(() => {});
+  }, [playing]);
+
+  return (
+    <div className={styles.panelImage}>
+      {playing ? (
+        <video ref={videoRef} className={styles.panelVideo} src={carharttVideo} controls muted playsInline />
+      ) : (
+        <>
+          <img src={dataCenterImage} alt="" loading="lazy" decoding="async" />
+          <div className={styles.playAvatarStack}>
+            <button
+              type="button"
+              className={styles.playCircle}
+              aria-label="Play video"
+              onClick={() => setPlaying(true)}
+            >
+              <PlayIcon />
+            </button>
+          </div>
+        </>
+      )}
+      {/* Slides in the moment playback actually starts, rather than sitting
+          there statically or competing with the thumbnail's play button. */}
+      <div
+        className={playing ? `${styles.panelStatBox} ${styles.panelStatBoxSlideIn}` : styles.panelStatBox}
+      >
+        <p className={styles.panelStatValue}>{stat}</p>
+        <p className={styles.panelStatLabel}>{statLabel}</p>
+      </div>
+    </div>
   );
 }
 
@@ -157,18 +220,7 @@ export function PlatformSurfacesTabbed() {
             </a>
           </div>
 
-          <div className={styles.panelImage}>
-            <img src={dataCenterImage} alt="" loading="lazy" decoding="async" />
-            <div className={styles.playAvatarStack}>
-              <div className={styles.playCircle} aria-hidden="true">
-                <PlayIcon />
-              </div>
-            </div>
-            <div className={styles.panelStatBox} data-reveal>
-              <p className={styles.panelStatValue}>{card.stat}</p>
-              <p className={styles.panelStatLabel}>{card.statLabel}</p>
-            </div>
-          </div>
+          <TabPanelImage stat={card.stat} statLabel={card.statLabel} />
         </div>
       </div>
     </section>

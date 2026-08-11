@@ -51,7 +51,13 @@ function StatCardFigure({ card, image }: { card: Omit<StatCard, "image" | "alt">
   const value = useCountUp(target, inView);
   return (
     <figure className={cardClass} ref={cardRef}>
-      <img className={styles.image} src={image} alt="" loading="lazy" decoding="async" />
+      <img
+        className={inView ? `${styles.image} ${styles.imageVisible}` : styles.image}
+        src={image}
+        alt=""
+        loading="lazy"
+        decoding="async"
+      />
       <figcaption className={styles.content}>
         <span className={styles.chip}>{card.chip}</span>
         <div className={styles.statContainer}>

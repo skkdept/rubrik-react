@@ -8,6 +8,7 @@ import {
   type PlatformSurfaceCard,
 } from "../../../data/platformSurfaces";
 import dataCenterImage from "../../../assets/data-center.webp";
+import carharttVideo from "../../../assets/carhartt-snippet.mp4";
 import styles from "./PlatformSurfacesStacked.module.css";
 
 const TOTAL_CARDS = PLATFORM_SURFACE_CARDS.length;
@@ -29,12 +30,86 @@ function ChevronIcon({ direction }: { direction: "up" | "down" }) {
   );
 }
 
+/**
+ * The same Carhartt customer story clip used in PlatformSurfacesTabbed
+ * stands in for every card's play button here too — see that component
+ * for why it isn't wired through `platformSurfaces` data.
+ *
+ * Unlike Tabbed's panels, these cards never unmount/remount as the stack
+ * advances (`DesktopStack` repositions the same persistent DOM nodes via
+ * transform rather than swapping them out), so `playing` can't reset for
+ * free via a `key` change — it's driven directly off `isActive` instead,
+ * autoplaying muted the moment a card becomes the top card and dropping
+ * back to the thumbnail the moment it isn't, so returning to it later
+ * (via the dots or scrolling back) starts fresh rather than picking up
+ * mid-clip or continuing to play off-screen. `isActive` defaults to `true`
+ * for the mobile/reduced-motion `StaticList` fallback, where every card is
+ * just a normal stacked list item with no "current" card concept.
+ */
+function StackedPanelImage({
+  stat,
+  statLabel,
+  isActive,
+}: {
+  stat: string;
+  statLabel: string;
+  isActive: boolean;
+}) {
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const [playing, setPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+    setPlaying(isActive);
+  }, [isActive, prefersReducedMotion]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!playing || !video) return;
+    video.currentTime = 0;
+    video.muted = true;
+    video.play().catch(() => {});
+  }, [playing]);
+
+  return (
+    <div className={styles.imagePanel}>
+      {playing ? (
+        <video ref={videoRef} className={styles.panelVideo} src={carharttVideo} controls muted playsInline />
+      ) : (
+        <>
+          <img src={dataCenterImage} alt="" loading="lazy" decoding="async" />
+          <button type="button" className={styles.playButton} aria-label="Play video" onClick={() => setPlaying(true)}>
+            <PlayIcon />
+          </button>
+        </>
+      )}
+      {/* Slides in 2s after playback actually starts — see
+          PlatformSurfacesStacked.module.css. */}
+      <div className={playing ? `${styles.statBox} ${styles.statBoxSlideIn}` : styles.statBox}>
+        <p className={styles.statValue}>{stat}</p>
+        <p className={styles.statLabel}>{statLabel}</p>
+      </div>
+    </div>
+  );
+}
+
 function CardPanel({
   card,
   entranceClass,
+  // Defaults to false, not true: `StaticList` (mobile, and desktop with
+  // prefers-reduced-motion) never passes this explicitly, and its
+  // `.imagePanel` is hidden below 1200px regardless — defaulting to true
+  // meant every one of its cards quietly autoplayed a muted video in the
+  // background at once, invisible but still downloading/decoding 4 copies
+  // of the clip for nothing. `false` just leaves it on the thumbnail,
+  // which still supports a manual click-to-play if the panel ever is
+  // visible (the desktop + reduced-motion case).
+  isActive = false,
 }: {
   card: PlatformSurfaceCard;
   entranceClass?: string;
+  isActive?: boolean;
 }) {
   return (
     <div className={styles.cardInner}>
@@ -65,16 +140,7 @@ function CardPanel({
           </div>
         </div>
 
-        <div className={styles.imagePanel}>
-          <img src={dataCenterImage} alt="" loading="lazy" decoding="async" />
-          <div className={styles.playButton} aria-hidden="true">
-            <PlayIcon />
-          </div>
-          <div className={styles.statBox}>
-            <p className={styles.statValue}>{card.stat}</p>
-            <p className={styles.statLabel}>{card.statLabel}</p>
-          </div>
-        </div>
+        <StackedPanelImage stat={card.stat} statLabel={card.statLabel} isActive={isActive} />
       </div>
     </div>
   );
@@ -266,7 +332,11 @@ function DesktopStack() {
             style={{ zIndex: i + 1, transform, opacity }}
             aria-hidden={i >= visible}
           >
-            <CardPanel card={card} entranceClass={i > 0 ? styles.enterOnActive : undefined} />
+            <CardPanel
+              card={card}
+              entranceClass={i > 0 ? styles.enterOnActive : undefined}
+              isActive={depth === 0 && i < visible}
+            />
           </div>
         );
       })}

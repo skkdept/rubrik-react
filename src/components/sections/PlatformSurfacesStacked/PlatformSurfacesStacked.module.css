@@ -189,7 +189,8 @@
   display: none;
 }
 
-.imagePanel img {
+.imagePanel img,
+.panelVideo {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -221,10 +222,17 @@
   width: 4.5rem;
   height: 4.5rem;
   border-radius: 50%;
+  border: none;
   background: var(--primitive-color-border-medium);
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  transition: transform 200ms ease;
+}
+
+.playButton:hover {
+  transform: scale(1.06);
 }
 
 .playButton svg {
@@ -241,6 +249,40 @@
   align-items: center;
   gap: var(--primitive-spacing-3);
   padding: var(--primitive-spacing-5) var(--primitive-spacing-4);
+  opacity: 0;
+  transform: translateX(24px);
+}
+
+.statBoxSlideIn {
+  /* Held off 2s so it reads as a deliberate beat after the video starts,
+     matching PlatformSurfacesTabbed's equivalent stat box. */
+  animation: statBoxSlideIn 800ms cubic-bezier(0.33, 1, 0.68, 1) 2s forwards;
+}
+
+@keyframes statBoxSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .playButton {
+    transition: none;
+  }
+
+  .statBox {
+    opacity: 1;
+    transform: none;
+  }
+
+  .statBoxSlideIn {
+    animation: none;
+  }
 }
 
 .statValue {
@@ -364,6 +406,32 @@
 
 .staticItem .title {
   font-size: clamp(1.5rem, 7vw, 2rem);
+}
+
+/* Photo/video panel above the text on mobile/tablet — `.imagePanel`'s
+   sitewide default is `display: none` below 1200px (it was never shown
+   here before video existed either); this is the one context where it's
+   deliberately turned back on. `order: -1` visually moves it before
+   `.textPanel` without touching CardPanel's shared markup, which both this
+   and the desktop stack render. Height is fixed (unlike the desktop row's
+   `flex: 1 1 0%`, which needs a tall flex parent this column layout
+   doesn't have) at the same 280px PlatformSurfacesTabbed uses at this
+   width, so the two "Platform Surfaces" variants match. */
+.staticItem .cardBody {
+  flex-direction: column;
+}
+
+.staticItem .imagePanel {
+  display: block;
+  flex: none;
+  order: -1;
+  height: 17.5rem;
+}
+
+.staticItem .statBox {
+  right: var(--primitive-spacing-4);
+  bottom: var(--primitive-spacing-4);
+  padding: var(--primitive-spacing-4) var(--primitive-spacing-3);
 }
 
 @media (min-width: 1200px) {

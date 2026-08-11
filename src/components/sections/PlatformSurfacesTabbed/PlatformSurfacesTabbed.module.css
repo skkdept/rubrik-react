@@ -140,16 +140,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .panelWrap {
-    opacity: 1;
-  }
-
-  .panelWrapAnimated {
-    animation: none;
-  }
-}
-
 @media (min-width: 1200px) {
   .panelWrap {
     padding: var(--primitive-spacing-9) 4.25rem 5.6875rem;
@@ -277,7 +267,8 @@
   }
 }
 
-.panelImage img {
+.panelImage img,
+.panelVideo {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -300,11 +291,18 @@
   width: 4.5625rem;
   height: 4.5625rem;
   border-radius: 50%;
+  border: none;
   background: var(--semantic-color-bg-surface-warm);
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  transition: transform 200ms ease;
+}
+
+.playCircle:hover {
+  transform: scale(1.06);
 }
 
 .playCircle svg {
@@ -321,6 +319,8 @@
   align-items: center;
   gap: var(--primitive-spacing-3);
   padding: var(--primitive-spacing-4) var(--primitive-spacing-5);
+  opacity: 0;
+  transform: translateX(24px);
 }
 
 @media (min-width: 1200px) {
@@ -328,6 +328,23 @@
     right: var(--primitive-spacing-7);
     bottom: var(--primitive-spacing-7);
     padding: var(--primitive-spacing-6) var(--primitive-spacing-7);
+  }
+}
+
+.panelStatBoxSlideIn {
+  /* Held off 2s so it reads as a deliberate beat after the video starts,
+     not a simultaneous part of the same entrance. */
+  animation: panelStatBoxSlideIn 800ms cubic-bezier(0.33, 1, 0.68, 1) 2s forwards;
+}
+
+@keyframes panelStatBoxSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
@@ -353,4 +370,33 @@
   line-height: var(--semantic-text-body-sm-line-height);
   color: var(--semantic-color-fg-primary);
   max-width: 8.5rem;
+}
+
+/* Kept at the very end of the file: with equal-specificity class selectors,
+   the LAST matching rule in source order wins regardless of which one sits
+   behind a media query — an override placed earlier than the base rule it's
+   meant to override loses even when its condition matches (see the Nav
+   sticky-header bug in ASSUMPTIONS.md for the same mistake made once
+   already in this codebase). */
+@media (prefers-reduced-motion: reduce) {
+  .playCircle {
+    transition: none;
+  }
+
+  .panelWrap {
+    opacity: 1;
+  }
+
+  .panelWrapAnimated {
+    animation: none;
+  }
+
+  .panelStatBox {
+    opacity: 1;
+    transform: none;
+  }
+
+  .panelStatBoxSlideIn {
+    animation: none;
+  }
 }
