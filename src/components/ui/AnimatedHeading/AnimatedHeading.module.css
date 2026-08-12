@@ -1,0 +1,41 @@
+.word {
+  display: inline-block;
+  overflow: hidden;
+  /* A tighter perspective (eg. 500px) exaggerates foreshortening near the
+     end of the rotation, so most of the visible motion gets compressed into
+     the last few degrees and reads as a snap instead of a glide. A longer
+     camera distance keeps the foreshortening gentle across the whole turn. */
+  perspective: 1400px;
+  /* Descenders (g, y) in the rotated word would get clipped by the mask
+     above without this — pad the box and pull it back with a negative
+     margin so line height in the paragraph flow is unaffected. */
+  padding-bottom: 0.15em;
+  margin-bottom: -0.15em;
+  vertical-align: top;
+}
+
+.wordInner {
+  display: inline-block;
+  transform: translateY(80%) rotateX(-90deg);
+  transform-origin: 50% 100%;
+  opacity: 0;
+  will-change: transform, opacity;
+  /* Approximates GSAP's power1.inOut (quadratic in/out), which is gentler
+     through the middle than CSS's built-in ease-in-out. */
+  transition:
+    transform 450ms cubic-bezier(0.455, 0.03, 0.515, 0.955),
+    opacity 450ms cubic-bezier(0.455, 0.03, 0.515, 0.955);
+}
+
+.wordInnerRevealed {
+  transform: translateY(0) rotateX(0deg);
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wordInner {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

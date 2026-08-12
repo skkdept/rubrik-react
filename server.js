@@ -29,8 +29,17 @@ function sign(payload) {
   return crypto.createHmac('sha256', SESSION_SECRET).update(payload).digest('hex')
 }
 
+// Short fingerprint of the current password, folded into every issued
+// token. Rotating SITE_PASSWORD changes this fingerprint, which makes every
+// previously issued cookie fail validation immediately — without that,
+// existing sessions would keep working for the full SESSION_TTL_MS after a
+// password change since the signature only ever depended on SESSION_SECRET.
+function passwordFingerprint() {
+  return crypto.createHash('sha256').update(SITE_PASSWORD).digest('hex').slice(0, 16)
+}
+
 function issueToken() {
-  const payload = String(Date.now() + SESSION_TTL_MS)
+  const payload = `${Date.now() + SESSION_TTL_MS}.${passwordFingerprint()}`
   return `${payload}.${sign(payload)}`
 }
 
@@ -47,7 +56,10 @@ function isValidToken(token) {
   if (signatureBuf.length !== expectedBuf.length) return false
   if (!crypto.timingSafeEqual(signatureBuf, expectedBuf)) return false
 
-  const expiresAt = Number(payload)
+  const [expiresAtRaw, fingerprint] = payload.split('.')
+  if (fingerprint !== passwordFingerprint()) return false
+
+  const expiresAt = Number(expiresAtRaw)
   return Number.isFinite(expiresAt) && expiresAt > Date.now()
 }
 

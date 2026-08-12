@@ -10,13 +10,21 @@ export interface PlatformSurfaceCard {
 
 /**
  * Shared content for PlatformSurfacesStacked and PlatformSurfacesTabbed — both
- * present the same 4 pieces of content via different interaction patterns.
- * Ported from the old repo's stacking-cards-section.tsx CARD_DATA.
+ * present the same 3 pieces of content via different interaction patterns.
+ *
+ * Trimmed from the old repo's stacking-cards-section.tsx CARD_DATA (4 cards:
+ * Data Security/Threat Detection/Compliance/Cyber Resilience) down to 3, to
+ * match this section's own heading ("One Architecture, Three Surfaces." /
+ * "Data. Identity. AI."). Real Data/Identity/AI copy has never existed
+ * anywhere in the design (see ASSUMPTIONS.md #65) — Compliance was dropped as
+ * the weakest fit, and the remaining 3 are relabeled DATA/IDENTITY/AI by
+ * category only; the body copy underneath is still the original
+ * security-flavored content, not a rewrite for its new label.
  */
 export const PLATFORM_SURFACE_CARDS: PlatformSurfaceCard[] = [
   {
     id: 0,
-    category: "DATA SECURITY",
+    category: "DATA",
     title: "Air-gapped, immutable, recoverable to a clean state.",
     description:
       "Protect, monitor, and recover every data set across cloud, on-prem, and SaaS, with preemptive recovery and autonomous restoration ensuring you're ready before an attack lands.",
@@ -31,7 +39,7 @@ export const PLATFORM_SURFACE_CARDS: PlatformSurfaceCard[] = [
   },
   {
     id: 1,
-    category: "THREAT DETECTION",
+    category: "IDENTITY",
     title: "Real-time threat intelligence across your entire estate.",
     description:
       "Monitor every endpoint, workload, and data flow with continuous threat detection, identifying ransomware, insider threats, and zero-day exploits before they cause damage.",
@@ -46,22 +54,7 @@ export const PLATFORM_SURFACE_CARDS: PlatformSurfaceCard[] = [
   },
   {
     id: 2,
-    category: "COMPLIANCE",
-    title: "Audit-ready compliance without the manual overhead.",
-    description:
-      "Maintain continuous compliance across HIPAA, SOC 2, GDPR, and more, with automated evidence collection and real-time policy enforcement across every data source.",
-    stat: "80%",
-    statLabel: "Reduction in audit preparation time",
-    features: [
-      "Automated evidence collection for 35+ compliance frameworks",
-      "Real-time policy drift detection and remediation",
-      "Data classification and sensitivity labeling at scale",
-      "Immutable audit trails that satisfy regulatory requirements",
-    ],
-  },
-  {
-    id: 3,
-    category: "CYBER RESILIENCE",
+    category: "AI",
     title: "Recover from attacks in minutes, not weeks.",
     description:
       "Our AI-powered recovery engine identifies the cleanest restore point, rebuilds your environment autonomously, and gets your business back to operation faster than any manual process.",

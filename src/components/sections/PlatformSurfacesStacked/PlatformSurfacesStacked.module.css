@@ -8,9 +8,16 @@
   display: none;
 }
 
-@media (min-width: 1200px) {
+/* Shows starting at tablet, matching the stack itself switching from the
+   mobile slider to the desktop-style DesktopStack at the same width. */
+@media (min-width: 768px) {
   .heading {
     display: block;
+  }
+}
+
+@media (min-width: 1200px) {
+  .heading {
     padding: 5.6875rem 4.25rem 1.875rem; /* 91px 68px 30px, per source */
   }
 }
@@ -43,10 +50,27 @@
 
 .card {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* Reserve a dedicated strip for `.controls` below, so the pills/arrows
+     sit clearly below the card's own text/video content instead of
+     overlapping it. */
+  bottom: 4.5rem;
+  /* Opacity here is only ever a 0->1 one-time reveal, the moment a card
+     first joins the visible stack (see the `i >= visible` check below) —
+     kept fast (300ms, well under the per-element text stagger's own
+     ~600-700ms full sequence) so it reads as the box quickly snapping into
+     place, not a second, slower whole-card fade competing with and
+     drowning out `.enterOnActive`'s per-element cascade underneath it. It
+     was previously 1100ms, which visually dominated: the same text pixels
+     were fading in via BOTH this box-level opacity AND the per-element
+     transition at once, so the deliberate title->description->features
+     stagger never read as distinct motion — it just looked like one slow,
+     smeared cross-fade. */
   transition:
     transform 650ms cubic-bezier(0.33, 1, 0.68, 1),
-    opacity 1100ms ease-out;
+    opacity 300ms ease-out;
   will-change: transform, opacity;
 }
 
@@ -159,14 +183,21 @@
   color: var(--semantic-color-fg-primary);
 }
 
-/* Cards 2–4 start hidden and fade+slide in once the card becomes the active
-   (top) card — card 1 is visible from load, matching the old behavior. */
+/* Applied per-element (badge row, title, description, each feature — see
+   `CardPanel`'s `reveal()`), not to the whole text panel as one block: every
+   card/slide starts each of these hidden and fades+slides in individually,
+   staggered via inline `transitionDelay`, the moment it becomes the active
+   (top) card — including the very first one, gated by `hasEnteredView` so
+   it plays once the section is actually visible rather than at mount.
+   Timing/easing/offset/step matches PlatformSurfacesTabbed's
+   `panelRevealFade`/`revealDelay` exactly, so advancing a card here reads
+   identically to switching a tab there. */
 .enterOnActive {
   opacity: 0;
   transform: translateY(12px);
   transition:
-    opacity 500ms ease 150ms,
-    transform 500ms ease 150ms;
+    opacity 500ms cubic-bezier(0.33, 1, 0.68, 1),
+    transform 500ms cubic-bezier(0.33, 1, 0.68, 1);
 }
 
 .card[data-active="true"] .enterOnActive {
@@ -302,7 +333,7 @@
   max-width: 8.5rem;
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 768px) {
   .imagePanel {
     display: block;
   }
@@ -311,14 +342,59 @@
   }
 }
 
+/* iPad/tablet only (768–1199px): `DesktopStack`'s scroll-jacked stepping
+   stays desktop-like at this width per an earlier explicit decision (not
+   the mobile slider's swipe-through-slides model) — only the card's own
+   internal layout follows mobile's stacked arrangement instead, video on
+   top and text below at full width, rather than desktop's fixed 477px
+   side-by-side column, which read as cramped at iPad widths. Scoped to
+   `.card` specifically (not the shared `.cardBody`/`.textPanel`/
+   `.imagePanel`/`.divider` base rules) so this only affects `DesktopStack`
+   — `.mobileSlide` is already column below 768px, and `.staticItem` (the
+   reduced-motion fallback) is already column unconditionally, both
+   untouched by this. Image height (20rem) and text padding are judgment
+   calls with no exact spec — bigger than mobile's 17.5rem/tighter padding
+   since there's more width to work with, smaller than desktop's full-height
+   flex column since text now sits below it instead of beside it. The
+   divider lines are desktop's side-by-side column guides specifically, so
+   they're turned back off here rather than cutting across the new stacked
+   layout. */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .card .cardBody {
+    flex-direction: column;
+  }
+
+  .card .textPanel {
+    width: 100%;
+    padding: var(--primitive-spacing-8) var(--primitive-spacing-7);
+  }
+
+  .card .imagePanel {
+    flex: none;
+    order: -1;
+    height: 20rem;
+  }
+
+  .card .divider {
+    display: none;
+  }
+}
+
+/* Fills the strip `.card`/`.mobileSlide` reserves at the bottom of
+   `.stackViewport`/`.mobileSlider` — sits below the card/slide's own text/
+   video content rather than overlapping it, centered across the full
+   section width. Shared by both DesktopStack and MobileSlider (only the
+   nav buttons' chevron direction differs between them). */
 .controls {
   position: absolute;
-  bottom: var(--primitive-spacing-6);
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4.5rem;
   z-index: 50;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--primitive-spacing-4);
 }
 
@@ -379,7 +455,15 @@
   color: var(--semantic-color-fg-slate);
 }
 
-/* ── Mobile/tablet: static stacked list ── */
+/* ── Tablet/desktop, prefers-reduced-motion only: static stacked list ──
+   (true mobile widths always get `.mobileSlider` below, regardless of
+   reduced motion, matching TestimonialCarousel's mobile carousel — a
+   scroll-snap swipe isn't the kind of motion that flag is meant to
+   suppress). Rendering is fully gated in the component itself, so no
+   width-based `display: none` is needed here — an earlier version of this
+   rule hid `.staticList` above 1200px unconditionally, which broke this
+   exact reduced-motion-desktop case by rendering it into the DOM and then
+   hiding it, leaving the section blank. */
 .staticList {
   display: flex;
   flex-direction: column;
@@ -408,10 +492,10 @@
   font-size: clamp(1.5rem, 7vw, 2rem);
 }
 
-/* Photo/video panel above the text on mobile/tablet — `.imagePanel`'s
-   sitewide default is `display: none` below 1200px (it was never shown
-   here before video existed either); this is the one context where it's
-   deliberately turned back on. `order: -1` visually moves it before
+/* Photo/video panel above the text — `.imagePanel`'s sitewide default is
+   `display: none` below 768px (it was never shown here before video existed
+   either); this is the one context where it's deliberately turned back on.
+   `order: -1` visually moves it before
    `.textPanel` without touching CardPanel's shared markup, which both this
    and the desktop stack render. Height is fixed (unlike the desktop row's
    `flex: 1 1 0%`, which needs a tall flex parent this column layout
@@ -434,8 +518,83 @@
   padding: var(--primitive-spacing-4) var(--primitive-spacing-3);
 }
 
-@media (min-width: 1200px) {
-  .staticList {
-    display: none;
+/* ── True mobile only (<768px): one full-bleed slide, scroll-jacked ──
+   Mirrors `.stackViewport`/`.card` directly (same pinned-viewport height,
+   same reserved bottom strip for `.controls`, same transition timing) —
+   `useStackNavigation` drives both, so the only real difference is the
+   transform axis: a horizontal slide (`.mobileSlide`'s inline
+   `translateX`) instead of `.card`'s vertical depth-stack, matching the
+   left/right arrows in `.controls` instead of up/down. Previously a
+   native horizontally-scrolling scroll-snap track (real swipe gestures for
+   free) — replaced so page-scroll/swipe advances slides the same locked,
+   one-at-a-time way `DesktopStack` already did, per explicit request:
+   scrolling should step to the next slide until the last one, and
+   scrolling back should just step back rather than racing through all of
+   them. */
+.mobileSlider {
+  position: relative;
+  width: 100%;
+  height: 100svh;
+  min-height: 37.5rem;
+  overflow: hidden;
+}
+
+.mobileSlide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 4.5rem;
+  transition:
+    transform 650ms cubic-bezier(0.33, 1, 0.68, 1),
+    opacity 300ms ease-out;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobileSlide {
+    transition: none;
   }
+}
+
+/* Overrides `.textPanel`'s fixed 477px desktop width; `overflow-y: auto`
+   (unlike the old scroll-snap version's `visible` override) is inherited
+   from the base rule on purpose now — content taller than the space left
+   above `.controls` scrolls within the panel instead of being clipped,
+   same as `.card .textPanel` on desktop. */
+.mobileSlide .textPanel {
+  width: 100%;
+  padding: var(--primitive-spacing-8) var(--primitive-spacing-4) var(--primitive-spacing-6);
+}
+
+.mobileSlide .title {
+  font-size: clamp(1.5rem, 7vw, 2rem);
+}
+
+/* Photo/video panel above the text, same 280px height as the tablet/desktop
+   reduced-motion fallback and PlatformSurfacesTabbed at this width. */
+.mobileSlide .cardBody {
+  flex-direction: column;
+}
+
+.mobileSlide .imagePanel {
+  display: block;
+  flex: none;
+  order: -1;
+  height: 17.5rem;
+}
+
+.mobileSlide .statBox {
+  right: var(--primitive-spacing-4);
+  bottom: var(--primitive-spacing-4);
+  padding: var(--primitive-spacing-4) var(--primitive-spacing-3);
+}
+
+/* Reuses the same hidden/revealed state `.card[data-active="true"]` drives
+   on desktop — `.enterOnActive` itself (above) is shared unchanged, only
+   what counts as "active" differs per container, so a slide fading in here
+   plays out identically to a card fading in on desktop. */
+.mobileSlide[data-active="true"] .enterOnActive {
+  opacity: 1;
+  transform: translateY(0);
 }

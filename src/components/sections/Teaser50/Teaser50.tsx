@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { CtaButton } from "../../ui/CtaButton/CtaButton";
 import { FormInput } from "../../ui/FormInput/FormInput";
 import { useScrollReveal } from "../../../lib/useScrollReveal";
+import { AnimatedHeading } from "../../ui/AnimatedHeading/AnimatedHeading";
 import dataCenterImage from "../../../assets/data-center.webp";
 import styles from "./Teaser50.module.css";
 
@@ -13,10 +14,10 @@ export function Teaser50() {
     <section ref={sectionRef} className={styles.section} aria-label="Get in touch">
       <div className={styles.grid}>
         <div className={`${styles.card} ${styles.cardDark}`}>
-          <h2 className={styles.cardHeading} data-reveal>
-            The foundation your enterprise needs. Start the conversation to find
-            out how it's right for yours.
-          </h2>
+          <AnimatedHeading
+            text="The foundation your enterprise needs. Start the conversation to find out how it's right for yours."
+            className={styles.cardHeading}
+          />
           <form
             className={styles.form}
             onSubmit={(e) => e.preventDefault()}
@@ -39,11 +40,10 @@ export function Teaser50() {
         <div className={`${styles.card} ${styles.cardPhoto}`}>
           <img src={dataCenterImage} alt="" loading="lazy" decoding="async" />
           <div className={styles.cardPhotoScrim} aria-hidden="true" />
-          <h2 className={styles.cardHeading} data-reveal>
-            When your data is secure,
-            <br />
-            your business is unstoppable
-          </h2>
+          <AnimatedHeading
+            text={"When your data is secure,\nyour business is unstoppable"}
+            className={styles.cardHeading}
+          />
           <div className={styles.cardAction}>
             <CtaButton variant="secondary" size="large" href="#contact">
               Contact Sales →

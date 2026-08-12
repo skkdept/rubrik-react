@@ -97,6 +97,14 @@
   background-position: 0 0, 30.5px 30.5px, 30.5px 30.5px;
 }
 
+/* PressGrid (WebGL) redraws this same lattice and takes over animating it —
+   hide the static copy so there's only ever one visible grid. `::after`'s
+   light-sweep is untouched, since it's a separate declaration, not
+   inherited from this rule. */
+.backgroundGridHidden {
+  background-image: none;
+}
+
 /* Decorative light sweep: a bright-white copy of the same grid pattern,
    revealed only through a moving diagonal band (a CSS mask, not an actual
    light source) so it looks like the intersections catch light as it
@@ -174,6 +182,27 @@
     animation: none;
     content: none;
   }
+}
+
+/* WebGL press/depth layer, painted directly on top of .backgroundGrid —
+   same box — so the dent appears to deform the real grid instead of a
+   second, separate one. Invisible at rest (see PressGrid.tsx's `presence`
+   gating), so no double-grid look when the cursor isn't over it. */
+.pressGrid {
+  position: absolute;
+  top: 3.5%;
+  left: 2.7%;
+  right: 2.7%;
+  bottom: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.pressGrid canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .content {
@@ -260,9 +289,14 @@
   width: 100%;
 }
 
-/* Empty product-screenshot slot — never filled in the source design either.
-   See ASSUMPTIONS.md. Rendered as a decorative placeholder, not a real image,
-   so it carries no alt text and is hidden from assistive tech. */
+/* Was an empty product-screenshot slot (never filled in the source design
+   either, see ASSUMPTIONS.md #12) — now holds `hero.png`/`hero.webp`, a
+   real asset. `overflow: hidden` + the img's own `object-fit: cover`
+   crops it to whatever height this box is at each breakpoint, rather than
+   stretching/distorting it or leaving letterboxing — the image's own
+   ~2:1 aspect ratio only matches this box's own ratio at the 1200px+
+   height (571px), so mobile/tablet crop its left/right edges symmetrically
+   instead. Background color kept as a fallback while the image loads. */
 .mediaPlaceholder {
   position: relative;
   z-index: 1;
@@ -272,6 +306,14 @@
   margin: var(--primitive-spacing-9) auto 0;
   background: var(--semantic-color-bg-surface-dark);
   border-radius: var(--primitive-radius-xl);
+  overflow: hidden;
+}
+
+.mediaPlaceholder img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 @media (min-width: 768px) {

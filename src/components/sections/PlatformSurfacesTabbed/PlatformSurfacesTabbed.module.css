@@ -48,18 +48,24 @@
   display: flex;
   width: 100%;
   gap: var(--primitive-spacing-2);
-  overflow-x: auto;
 }
 
 @media (min-width: 1200px) {
   .tabBar {
     gap: var(--primitive-spacing-4);
-    overflow-x: visible;
   }
 }
 
+/* `flex: 1 1 0%` at every breakpoint, not just desktop — with exactly 3
+   short category labels (DATA/IDENTITY/AI), splitting the tab bar into
+   equal thirds fits comfortably on mobile too, so there's no need for the
+   horizontally-scrolling pill row this used when the row could hold more/
+   longer tabs. `min-width: 0` lets a tab shrink below its label's natural
+   width if it ever has to, instead of forcing the row wider than the
+   screen and silently reintroducing horizontal scroll. */
 .tab {
-  flex: 0 0 auto;
+  flex: 1 1 0%;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: var(--primitive-spacing-2);
@@ -73,7 +79,6 @@
 
 @media (min-width: 1200px) {
   .tab {
-    flex: 1 1 0%;
     padding: var(--primitive-spacing-4) var(--primitive-spacing-5);
   }
 }
@@ -104,35 +109,37 @@
   color: var(--semantic-color-fg-primary);
 }
 
-/* No animation here directly — a plain CSS `animation` property plays (and,
-   at 400ms, finishes) the instant the element mounts. That's correct for a
-   tab switch (the panel is already on-screen when you click), but the very
-   FIRST panel mounts as part of the initial page render, typically while
-   this section is still hundreds of pixels below the fold — the animation
-   plays and completes off-screen before the user ever scrolls down to see
-   it, so the first view never actually shows it, only later clicks do.
-   `.panelWrapAnimated` (below) is added only once the section has actually
-   scrolled into view, deferring the very first play until it's visible;
-   every subsequent tab click already happens with the section in view, so
-   the class is already present at mount and plays immediately as before. */
 .panelWrap {
   padding: var(--primitive-spacing-7) var(--primitive-spacing-4) var(--primitive-spacing-8);
-  opacity: 0;
 }
 
-.panelWrapAnimated {
-  /* `forwards` is required here specifically because `.panelWrap` now has
-     an explicit `opacity: 0` base state (needed for the pre-scroll-in
-     case above) — without it, the element snaps back to that base opacity
-     the instant the animation ends instead of holding the keyframe's `to`
-     state, undoing the fade-in a moment after it finishes. */
-  animation: tabPanelFadeIn 400ms cubic-bezier(0.33, 1, 0.68, 1) forwards;
+/* Per-element stagger (title → description → each feature → Explore link),
+   applied via inline `animationDelay` from the component (feature count is
+   dynamic, so the stagger can't be pure CSS). A plain CSS `animation`
+   (rather than a `transition`) plays the instant an element mounts — since
+   `key={active}` fully remounts the panel's DOM on every tab switch, this
+   replays reliably every time with no re-triggering logic needed, unlike
+   the old per-element `data-reveal`/useScrollReveal approach (which only
+   ever wired up the very first panel and silently never fired again).
+
+   Gated by `hasEnteredView` in the component so the very FIRST panel —
+   mounted as part of the initial page render, typically hundreds of pixels
+   below the fold — doesn't play and finish its entrance off-screen before
+   the user ever scrolls down to see it; every subsequent tab click already
+   happens with the section in view, so the class is applied from that
+   element's very first render and plays immediately.
+
+   Duration/easing/offset/stagger step matches PlatformSurfacesStacked's
+   `.enterOnActive`/`revealDelay` exactly, so switching a tab here reads
+   identically to advancing a card/slide there. */
+.panelReveal {
+  animation: panelRevealFade 500ms cubic-bezier(0.33, 1, 0.68, 1) both;
 }
 
-@keyframes tabPanelFadeIn {
+@keyframes panelRevealFade {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -383,12 +390,10 @@
     transition: none;
   }
 
-  .panelWrap {
-    opacity: 1;
-  }
-
-  .panelWrapAnimated {
+  .panelReveal {
     animation: none;
+    opacity: 1;
+    transform: none;
   }
 
   .panelStatBox {

@@ -45,6 +45,49 @@
   letter-spacing: normal;
 }
 
+/* Always visible — per explicit user decision, this button must never
+   disappear from the nav at any width, unlike `.langSelector`/`.navGroups`/
+   `.searchGroup` (which hide below 1200px for layout reasons: no room for
+   full nav links or the search bar). Two earlier attempts at hiding it
+   (below 1200px, then below 420px) both got reverted: hiding it below
+   1200px silently dropped it for every tablet and small-laptop width too
+   ("lost"), and hiding it below 420px still lost it on the narrowest
+   common phones.
+
+   Instead, the button and its neighbors' own spacing shrink below 1200px
+   (below that, `.secondaryGroup` only ever holds this button + the menu
+   toggle — `.langSelector`/`.navGroups` are already hidden there) so
+   everything fits without removing anything. Measured empirically at a
+   375px viewport (iPhone SE/mini/standard-width tier — the tightest
+   *currently common* width): logo + full-Figma-padding button + the 40px
+   menu toggle overflowed the bar by 15.5px, clipped by App.module.css's
+   `overflow-x: clip` so it read as the hamburger icon sitting flush
+   against/cut off by the screen edge rather than erroring loudly as a
+   scrollbar would.
+
+   Shrinking this button's horizontal padding alone (24px→10px each side)
+   plus the gap next to the menu toggle (16px→8px) was the first fix and
+   worked — but the gap was then deliberately widened back up to 24px (see
+   `.secondaryGroup`'s own override below) for more visible space next to
+   the menu toggle, which reopened the same overflow. Recovered the
+   difference two more ways instead of shrinking this button further into
+   an unreadably cramped 2-4px of padding: tightened this padding a bit
+   more (10px→8px each side) and gave `.bar` itself less edge padding at
+   this width too (see below) — together, re-tested down to a 360px
+   viewport (common smaller-Android width) with 5.5px of clearance to
+   spare. Not chased further down to 320px (iPhone 5/SE 1st-gen width) — no
+   current production device ships that narrow, and closing that much more
+   space would need a genuinely different mobile treatment (e.g. an
+   icon-only button), not just tighter padding. Vertical padding/radius/
+   weight/font stay at the Figma spec above at every width — only the two
+   horizontal sides shrink. */
+@media (max-width: 1199px) {
+  .navCta {
+    padding-left: 0.5rem; /* 8px, was 24px */
+    padding-right: 0.5rem;
+  }
+}
+
 /* The nav uses its own fixed 24px horizontal padding and 83px height at
    every breakpoint, per source — distinct from the 16/32/64px page margin
    the rest of the page uses (Container), not a version of it. */
@@ -60,6 +103,19 @@
   transition: height 220ms ease;
 }
 
+/* The 24px edge padding above is the measured/source value and holds at
+   every *desktop* width, but below 1200px it's one of several things
+   trimmed back to keep the Contact Sales button both visible and
+   non-overflowing once `.secondaryGroup`'s own gap widened back up to 24px
+   (see that rule's comment) — see `.navCta`'s comment for the full
+   narrow-width budget this is part of. 12px is still a normal-looking
+   mobile edge margin, just tighter than the desktop measurement. */
+@media (max-width: 1199px) {
+  .bar {
+    padding-inline: 0.75rem; /* 12px, was 24px */
+  }
+}
+
 /* 3 groups (logo+primary links / search / secondary links+CTA). The search
    group is `flex: 1` and centers its own content, so it fills whatever
    space is left between the two content-sized side groups — that reads as
@@ -71,6 +127,26 @@
   align-items: center;
   gap: var(--primitive-spacing-4); /* 16px, per source — uniform with navList's own link gap */
   flex-shrink: 0;
+}
+
+/* With equal-specificity class selectors, the LAST matching rule in source
+   order wins regardless of which one sits behind a media query — an
+   override placed earlier than the base rule it's meant to override loses
+   even when its condition matches (this exact mistake has bitten this
+   codebase before — see the Nav sticky-header bug and
+   PlatformSurfacesTabbed's reduced-motion block in ASSUMPTIONS.md), which
+   is why this stays below the shared rule above. Below 1200px,
+   `.secondaryGroup` only ever holds the Contact Sales button + the menu
+   toggle (`.langSelector`/`.navGroups` are already hidden there) — widened
+   to 24px per user request for more visible space between the two, up
+   from the shared 16px. This reopens the overflow this same button was
+   fixed for at narrow widths (see `.navCta`'s own comment above) by
+   itself; `.bar`'s own padding-inline override below closes the gap back
+   up. */
+@media (max-width: 1199px) {
+  .secondaryGroup {
+    gap: 1.5rem; /* 24px, was 16px */
+  }
 }
 
 .searchGroup {

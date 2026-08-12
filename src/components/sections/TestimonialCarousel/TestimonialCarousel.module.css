@@ -151,12 +151,18 @@
   line-height: var(--semantic-text-body-sm-line-height);
 }
 
-/* ── Desktop: hover/focus-expanding carousel ── */
+/* ── Desktop: hover/focus-expanding carousel ──
+   Switches over at 768px (tablet), not 1200px — every other section on
+   this page (Nav, PlatformSurfaces, StatCardGrid) treats iPad-width
+   viewports as "desktop-like", not mobile; this was the one component
+   still using 1200px as its sole breakpoint, so an iPad Air (~820px,
+   squarely in the 768-1199px range) got the single-card swipeable mobile
+   layout — the exact "looks like an iPhone" bug this was fixed for. */
 .desktopRow {
   display: none;
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 768px) {
   .mobileList {
     display: none;
   }
@@ -174,11 +180,36 @@
   }
 }
 
+/* iPad/tablet only (768-1199px): the desktop row's sizing (68px side
+   padding, a fixed 204px photo strip) assumes 1200px+ of width to work
+   with — at true desktop, 3 collapsed cards + 1 expanded one still leaves
+   each collapsed photo strip comfortably wider than itself. Below 1200px
+   there isn't enough room for that math to hold (the fixed-width photo
+   strip would get clipped down well below its own width by the collapsed
+   card's much narrower flex-computed share), so both shrink here — no
+   exact spec for this tier, a judgment call sized to keep collapsed cards
+   legible rather than clipped to a sliver. */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .desktopRow {
+    padding-inline: var(--primitive-spacing-6);
+    height: 26rem; /* 416px */
+  }
+
+  .photoStrip {
+    width: 6rem; /* 96px, was 204px */
+  }
+}
+
 .desktopCard {
   flex: 1 1 0%;
   min-width: 0;
   overflow: hidden;
-  transition: flex 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  /* 350ms → 700ms and a gentler curve (matching the rest of the site's
+     "smooth" reveals, eg. PlatformSurfaces' `.enterOnActive`) — the quick
+     linear-ish Material easing read as an abrupt snap once this same
+     transition started firing on every autoplay tick, not just an
+     occasional deliberate hover. */
+  transition: flex 700ms cubic-bezier(0.33, 1, 0.68, 1);
 }
 
 .desktopCard.desktopCardActive {
@@ -235,7 +266,12 @@
   flex: 0 0 0px;
   overflow: hidden;
   min-width: 0;
-  transition: flex 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  /* 350ms → 700ms and a gentler curve (matching the rest of the site's
+     "smooth" reveals, eg. PlatformSurfaces' `.enterOnActive`) — the quick
+     linear-ish Material easing read as an abrupt snap once this same
+     transition started firing on every autoplay tick, not just an
+     occasional deliberate hover. */
+  transition: flex 700ms cubic-bezier(0.33, 1, 0.68, 1);
 }
 
 .desktopCardActive .textPanel {
@@ -252,13 +288,20 @@
   min-width: 0;
   box-sizing: border-box;
   background: var(--semantic-color-bg-surface-dark);
+  /* Hides the squeezed pre-expansion text while `.textPanel` is collapsed
+     to 0 width — kept fast and symmetric (was 150ms in / 350ms-after-a-
+     150ms-delay out) so this box-level fade just "opens the door" quickly;
+     the per-word flip cascade on the text itself (see `AnimatedHeading`
+     usages below) is the actual visible reveal motion. A slower box-level
+     fade here would compete with and drown out that per-word stagger on
+     the same pixels — the same masking bug found in PlatformSurfacesStacked
+     (see that file's `.card` comment). */
   opacity: 0;
-  transition: opacity 150ms ease;
+  transition: opacity 200ms ease;
 }
 
 .desktopCardActive .textPanelInner {
   opacity: 1;
-  transition: opacity 350ms ease 150ms;
 }
 
 .textPanelTop {

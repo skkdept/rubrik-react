@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { FAQ_ITEMS } from "../../../data/faq";
 import { useScrollReveal } from "../../../lib/useScrollReveal";
+import { AnimatedHeading } from "../../ui/AnimatedHeading/AnimatedHeading";
 import styles from "./FaqSection.module.css";
 
 function AccordionItem({
@@ -69,9 +70,7 @@ export function FaqSection() {
         <p className={styles.kicker} data-reveal>
           FAQ
         </p>
-        <h2 className={styles.heading} id="faq-heading" data-reveal>
-          Everything you need to know.
-        </h2>
+        <AnimatedHeading text="Everything you need to know." id="faq-heading" className={styles.heading} />
       </div>
 
       <div className={styles.list}>

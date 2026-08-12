@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Container } from "../../layout/Container/Container";
 import { useScrollReveal } from "../../../lib/useScrollReveal";
 import { useCountUp } from "../../../lib/useCountUp";
+import { AnimatedHeading } from "../../ui/AnimatedHeading/AnimatedHeading";
 import { STAT_CARDS, type StatCard } from "../../../data/statCards";
 import statCardAi from "../../../assets/stat-card-ai.webp";
 import statCardSaas from "../../../assets/stat-card-saas.webp";
@@ -65,9 +66,7 @@ function StatCardFigure({ card, image }: { card: Omit<StatCard, "image" | "alt">
             {value}
             {suffix}
           </p>
-          <p className={styles.caption} data-reveal>
-            {card.caption}
-          </p>
+          <AnimatedHeading as="p" text={card.caption} className={styles.caption} />
         </div>
       </figcaption>
     </figure>

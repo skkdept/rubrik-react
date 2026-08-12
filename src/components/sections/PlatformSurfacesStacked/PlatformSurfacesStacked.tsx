@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
-import { useIsDesktop } from "../../../lib/useBreakpoint";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useIsTabletUp } from "../../../lib/useBreakpoint";
 import { usePrefersReducedMotion } from "../../../lib/usePrefersReducedMotion";
 import { useScrollReveal } from "../../../lib/useScrollReveal";
+import { AnimatedHeading } from "../../ui/AnimatedHeading/AnimatedHeading";
 import {
   PLATFORM_SURFACE_CARDS,
   PLATFORM_SURFACES_HEADING,
@@ -14,6 +15,15 @@ import styles from "./PlatformSurfacesStacked.module.css";
 const TOTAL_CARDS = PLATFORM_SURFACE_CARDS.length;
 const ANIM_MS = 650;
 
+// Matches PlatformSurfacesTabbed's own per-element stagger step exactly, so
+// advancing a card/slide here reads as the same animation as switching a tab
+// there (see that file's `revealDelay`).
+const REVEAL_STEP_MS = 70;
+
+function revealDelay(step: number): CSSProperties {
+  return { transitionDelay: `${step * REVEAL_STEP_MS}ms` };
+}
+
 function PlayIcon() {
   return (
     <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -22,9 +32,11 @@ function PlayIcon() {
   );
 }
 
-function ChevronIcon({ direction }: { direction: "up" | "down" }) {
+const CHEVRON_ROTATION = { up: "rotate(180deg)", down: undefined, left: "rotate(90deg)", right: "rotate(-90deg)" } as const;
+
+function ChevronIcon({ direction }: { direction: "up" | "down" | "left" | "right" }) {
   return (
-    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" style={{ transform: direction === "up" ? "rotate(180deg)" : undefined }}>
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" style={{ transform: CHEVRON_ROTATION[direction] }}>
       <path d="M10 4v12M5 11l5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
@@ -96,7 +108,14 @@ function StackedPanelImage({
 
 function CardPanel({
   card,
-  entranceClass,
+  // Defaults to false, not true: `StaticList` (mobile/desktop with
+  // prefers-reduced-motion) never passes this explicitly, since it renders
+  // every card at once with no "current card" concept to reveal against.
+  // When true, each text element gets `.enterOnActive` (hidden until its
+  // ancestor's `data-active="true"`) plus a staggered `revealDelay`, so the
+  // text visibly cascades in top-to-bottom rather than popping in as one
+  // block — same stagger step PlatformSurfacesTabbed uses per element.
+  revealChildren = false,
   // Defaults to false, not true: `StaticList` (mobile, and desktop with
   // prefers-reduced-motion) never passes this explicitly, and its
   // `.imagePanel` is hidden below 1200px regardless — defaulting to true
@@ -108,30 +127,37 @@ function CardPanel({
   isActive = false,
 }: {
   card: PlatformSurfaceCard;
-  entranceClass?: string;
+  revealChildren?: boolean;
   isActive?: boolean;
 }) {
+  const reveal = (step: number) =>
+    revealChildren ? { className: styles.enterOnActive, style: revealDelay(step) } : { className: "", style: undefined };
+
   return (
     <div className={styles.cardInner}>
-      <div className={`${styles.divider} ${entranceClass ?? ""}`} style={{ left: "3.125rem" }} aria-hidden="true" />
-      <div className={`${styles.divider} ${entranceClass ?? ""}`} style={{ right: "3rem" }} aria-hidden="true" />
+      <div className={`${styles.divider} ${reveal(0).className}`} style={{ left: "3.125rem", ...reveal(0).style }} aria-hidden="true" />
+      <div className={`${styles.divider} ${reveal(0).className}`} style={{ right: "3rem", ...reveal(0).style }} aria-hidden="true" />
 
       <div className={styles.cardBody}>
-        <div className={`${styles.textPanel} ${entranceClass ?? ""}`}>
-          <div className={styles.badgeRow}>
+        <div className={styles.textPanel}>
+          <div className={`${styles.badgeRow} ${reveal(0).className}`} style={reveal(0).style}>
             <div className={styles.categoryRow}>
               <span className={styles.categoryDot} aria-hidden="true" />
               <span className={styles.category}>{card.category}</span>
             </div>
           </div>
 
-          <h3 className={styles.title}>{card.title}</h3>
+          <h3 className={`${styles.title} ${reveal(1).className}`} style={reveal(1).style}>
+            {card.title}
+          </h3>
 
           <div className={styles.textBody}>
-            <p className={styles.description}>{card.description}</p>
+            <p className={`${styles.description} ${reveal(2).className}`} style={reveal(2).style}>
+              {card.description}
+            </p>
             <ul className={styles.features}>
-              {card.features.map((feature) => (
-                <li className={styles.feature} key={feature}>
+              {card.features.map((feature, i) => (
+                <li className={`${styles.feature} ${reveal(3 + i).className}`} style={reveal(3 + i).style} key={feature}>
                   <span className={styles.featureDot} aria-hidden="true" />
                   <p className={styles.featureText}>{feature}</p>
                 </li>
@@ -146,13 +172,60 @@ function CardPanel({
   );
 }
 
-function DesktopStack() {
+/**
+ * Scroll-jacking state machine shared by `DesktopStack`'s depth-stacked
+ * cards and `MobileSlider`'s single-slide view — extracted so advancing a
+ * card/slide behaves identically on both: locks page scroll while stepping
+ * through one at a time (forward or back), releases it once you're past
+ * the last one, and stepping back just steps back one at a time rather
+ * than cycling through everything. `visible` is a 1-indexed "how many
+ * cards has the user reached" count (matching `DesktopStack`'s original
+ * model — card `i` is active when `i === visible - 1`); `MobileSlider`
+ * derives its own 0-indexed `index` from it instead of duplicating the
+ * state machine with an off-by-one variant.
+ */
+function useStackNavigation(total: number) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const visibleRef = useRef(1);
   const lockedRef = useRef(false);
   const animRef = useRef(false);
   const doneRef = useRef(false);
   const [visible, setVisible] = useState(1);
+
+  // Card/slide 1 is visible from the very first render (`data-active` is
+  // already true at mount for i=0), so without this its text would render
+  // already fully revealed with no entrance to ever play — including when
+  // the section first scrolls into view, which is exactly when we want it
+  // to. Gating `data-active` on this too (in each consumer) turns that
+  // mount-time "already true" into a genuine false->true change once the
+  // section is actually visible, so `.enterOnActive`'s transition fires
+  // for real. Cards/slides 2+ are unaffected: their own data-active flips
+  // only ever happen via user interaction, which necessarily happens after
+  // the section is in view, so `hasEnteredView` is already true by then
+  // regardless.
+  //
+  // Observed with a deep `-40%` bottom rootMargin rather than a small
+  // threshold on `sectionRef` itself: `sectionRef` here is the full 100svh
+  // viewport container, and a plain 10%-of-height threshold fires once
+  // just its top sliver is visible — long before the actual card text
+  // (which sits within it) has scrolled into view. Requiring it to reach
+  // well into the viewport avoids reveal-plays-off-screen, the same class
+  // of bug PlatformSurfacesTabbed had.
+  const [hasEnteredView, setHasEnteredView] = useState(false);
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries[0].isIntersecting) return;
+        setHasEnteredView(true);
+        observer.disconnect();
+      },
+      { threshold: 0, rootMargin: "0px 0px -40% 0px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const sync = (n: number) => {
     visibleRef.current = n;
@@ -179,7 +252,7 @@ function DesktopStack() {
 
   const showNext = () => {
     if (animRef.current) return;
-    if (visibleRef.current >= TOTAL_CARDS) {
+    if (visibleRef.current >= total) {
       doneRef.current = true;
       unlock();
       return;
@@ -188,7 +261,7 @@ function DesktopStack() {
     sync(visibleRef.current + 1);
     setTimeout(() => {
       animRef.current = false;
-      if (visibleRef.current >= TOTAL_CARDS) {
+      if (visibleRef.current >= total) {
         doneRef.current = true;
         unlock();
       }
@@ -210,7 +283,7 @@ function DesktopStack() {
   };
 
   const jumpTo = (index: number) => {
-    doneRef.current = index >= TOTAL_CARDS - 1;
+    doneRef.current = index >= total - 1;
     sync(index + 1);
   };
 
@@ -230,7 +303,7 @@ function DesktopStack() {
       if (!inView()) return;
 
       if (!lockedRef.current) {
-        if (e.deltaY > 5 && !doneRef.current && visibleRef.current < TOTAL_CARDS) {
+        if (e.deltaY > 5 && !doneRef.current && visibleRef.current < total) {
           e.preventDefault();
           lock();
           showNext();
@@ -257,7 +330,7 @@ function DesktopStack() {
       if (!inView()) return;
       const delta = touchY - e.changedTouches[0].clientY;
       if (!lockedRef.current) {
-        if (delta > 40 && !doneRef.current && visibleRef.current < TOTAL_CARDS) {
+        if (delta > 40 && !doneRef.current && visibleRef.current < total) {
           lock();
           showNext();
         } else if (delta < -40 && doneRef.current) {
@@ -288,7 +361,17 @@ function DesktopStack() {
       window.removeEventListener("touchmove", onTouchMove);
       document.body.style.overflow = "";
     };
+    // `total` is a caller-supplied constant (TOTAL_CARDS), never reactive —
+    // deliberately not a dependency, matching the original DesktopStack
+    // effect this was extracted from.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  return { sectionRef, visible, hasEnteredView, showNext, showPrev, jumpTo };
+}
+
+function DesktopStack() {
+  const { sectionRef, visible, hasEnteredView, showNext, showPrev, jumpTo } = useStackNavigation(TOTAL_CARDS);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown" || e.key === "ArrowRight") {
@@ -328,13 +411,13 @@ function DesktopStack() {
           <div
             key={card.id}
             className={styles.card}
-            data-active={depth === 0 && i < visible}
+            data-active={depth === 0 && i < visible && hasEnteredView}
             style={{ zIndex: i + 1, transform, opacity }}
             aria-hidden={i >= visible}
           >
             <CardPanel
               card={card}
-              entranceClass={i > 0 ? styles.enterOnActive : undefined}
+              revealChildren
               isActive={depth === 0 && i < visible}
             />
           </div>
@@ -381,6 +464,97 @@ function DesktopStack() {
   );
 }
 
+/**
+ * Mobile-only: one full-width slide at a time, advanced by the exact same
+ * scroll-jacked stepping as `DesktopStack` (see `useStackNavigation`) —
+ * scrolling/swiping the page moves to the next slide until the last one,
+ * then releases the page to scroll normally; scrolling back while still
+ * mid-stack steps back one slide at a time rather than racing through all
+ * of them. A left/right arrow pair flanks the pill row (rather than
+ * DesktopStack's up/down pair), matching the horizontal slide direction.
+ *
+ * `revealChildren`/`isActive` are wired the same way DesktopStack wires them
+ * to its cards — every slide's text cascades in per-element via the shared
+ * `.enterOnActive` the moment it becomes current (including slide 0, once
+ * the slider has actually scrolled into view — see `hasEnteredView`), and
+ * only the current slide's video autoplays — so advancing a slide here
+ * looks and behaves identically to advancing a card there.
+ */
+function MobileSlider() {
+  const { sectionRef, visible, hasEnteredView, showNext, showPrev, jumpTo } = useStackNavigation(TOTAL_CARDS);
+  const index = visible - 1;
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      showNext();
+    } else if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      showPrev();
+    }
+  };
+
+  return (
+    <div
+      ref={sectionRef}
+      className={styles.mobileSlider}
+      onKeyDown={handleKeyDown}
+      role="group"
+      aria-roledescription="carousel"
+      aria-label="Platform surfaces"
+    >
+      {PLATFORM_SURFACE_CARDS.map((card, i) => {
+        const offset = i - index;
+        const isCurrent = offset === 0;
+        return (
+          <div
+            key={card.id}
+            className={styles.mobileSlide}
+            data-active={isCurrent && hasEnteredView}
+            style={{ transform: `translateX(${offset * 100}%)`, opacity: isCurrent ? 1 : 0 }}
+            aria-hidden={!isCurrent}
+          >
+            <CardPanel card={card} revealChildren isActive={isCurrent} />
+          </div>
+        );
+      })}
+
+      <div className={styles.controls}>
+        <button
+          type="button"
+          className={styles.navButton}
+          onClick={showPrev}
+          disabled={visible <= 1}
+          aria-label="Previous surface"
+        >
+          <ChevronIcon direction="left" />
+        </button>
+        <div className={styles.dots}>
+          {PLATFORM_SURFACE_CARDS.map((card, i) => (
+            <button
+              key={card.id}
+              type="button"
+              className={`${styles.dot} ${i === index ? styles.dotActive : i < index ? styles.dotSeen : ""}`}
+              aria-label={`Show ${card.category.toLowerCase()} surface`}
+              aria-current={i === index}
+              onClick={() => jumpTo(i)}
+            />
+          ))}
+        </div>
+        <button
+          type="button"
+          className={styles.navButton}
+          onClick={showNext}
+          disabled={visible >= TOTAL_CARDS}
+          aria-label="Next surface"
+        >
+          <ChevronIcon direction="right" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function StaticList() {
   return (
     <div className={styles.staticList}>
@@ -394,9 +568,12 @@ function StaticList() {
 }
 
 export function PlatformSurfacesStacked() {
-  const isDesktop = useIsDesktop();
+  // Tablet (iPad etc., >=768px) gets the same scroll-driven stack as
+  // desktop, not the plain mobile list — only true mobile widths and the
+  // reduced-motion fallback fall through to the simpler layouts below.
+  const isTabletUp = useIsTabletUp();
   const prefersReducedMotion = usePrefersReducedMotion();
-  const useStack = isDesktop && !prefersReducedMotion;
+  const useStack = isTabletUp && !prefersReducedMotion;
   const sectionRef = useRef<HTMLElement>(null);
   useScrollReveal(sectionRef);
 
@@ -407,15 +584,16 @@ export function PlatformSurfacesStacked() {
       aria-labelledby="platform-surfaces-stacked-heading"
     >
       <div className={styles.heading}>
-        <p className={styles.headingLine1} id="platform-surfaces-stacked-heading" data-reveal>
-          {PLATFORM_SURFACES_HEADING.title}
-        </p>
-        <p className={styles.headingLine2} data-reveal>
-          {PLATFORM_SURFACES_HEADING.subtitle}
-        </p>
+        <AnimatedHeading
+          as="p"
+          text={PLATFORM_SURFACES_HEADING.title}
+          id="platform-surfaces-stacked-heading"
+          className={styles.headingLine1}
+        />
+        <AnimatedHeading as="p" text={PLATFORM_SURFACES_HEADING.subtitle} className={styles.headingLine2} />
       </div>
 
-      {useStack ? <DesktopStack /> : <StaticList />}
+      {useStack ? <DesktopStack /> : isTabletUp ? <StaticList /> : <MobileSlider />}
     </section>
   );
 }

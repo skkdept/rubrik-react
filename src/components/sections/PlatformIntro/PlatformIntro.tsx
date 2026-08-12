@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { Container } from "../../layout/Container/Container";
 import { useScrollReveal } from "../../../lib/useScrollReveal";
+import { AnimatedHeading } from "../../ui/AnimatedHeading/AnimatedHeading";
 import styles from "./PlatformIntro.module.css";
 
 function PlusMark({ style }: { style: React.CSSProperties }) {
@@ -22,17 +23,17 @@ export function PlatformIntro() {
 
       <Container>
         <div className={styles.row}>
-          <h2 className={styles.heading} data-reveal>
-            Most platforms are bolted together. Rubrik is the only platform for
-            data, identity and AI.
-          </h2>
+          <AnimatedHeading
+            text="Most platforms are bolted together. Rubrik is the only platform for data, identity and AI."
+            className={styles.heading}
+          />
 
           <div className={styles.bodyWrap}>
-            <p className={styles.body} data-reveal>
-              Rubrik is built from the foundation up, not patched together from
-              point solutions. The architecture holds regardless of what's
-              happening: an attack, a scaling event, a new agent in production.
-            </p>
+            <AnimatedHeading
+              as="p"
+              text="Rubrik is built from the foundation up, not patched together from point solutions. The architecture holds regardless of what's happening: an attack, a scaling event, a new agent in production."
+              className={styles.body}
+            />
             <PlusMark style={{ left: 6, top: 0 }} />
             <PlusMark style={{ left: 0, bottom: 0 }} />
             <PlusMark style={{ right: 6, top: 0 }} />

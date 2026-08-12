@@ -1,13 +1,23 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
 import {
   PLATFORM_SURFACE_CARDS,
   PLATFORM_SURFACES_HEADING,
 } from "../../../data/platformSurfaces";
 import { useScrollReveal } from "../../../lib/useScrollReveal";
 import { usePrefersReducedMotion } from "../../../lib/usePrefersReducedMotion";
+import { AnimatedHeading } from "../../ui/AnimatedHeading/AnimatedHeading";
 import dataCenterImage from "../../../assets/data-center.webp";
 import carharttVideo from "../../../assets/carhartt-snippet.mp4";
 import styles from "./PlatformSurfacesTabbed.module.css";
+
+// Matches PlatformSurfacesStacked's own per-element stagger step exactly, so
+// a tab switch here and a card/slide advance there read as the same
+// animation (see that file's `revealDelay`).
+const REVEAL_STEP_MS = 70;
+
+function revealDelay(step: number): CSSProperties {
+  return { animationDelay: `${step * REVEAL_STEP_MS}ms` };
+}
 
 function ArrowRightIcon() {
   return (
@@ -100,15 +110,34 @@ export function PlatformSurfacesTabbed() {
   useScrollReveal(sectionRef);
   const card = PLATFORM_SURFACE_CARDS[active];
 
-  // Gates the panel's fade-in (see PlatformSurfacesTabbed.module.css) so the
-  // very first panel — mounted as part of the initial page render, usually
-  // well below the fold — doesn't play and finish its entrance off-screen
-  // before the user ever scrolls to it. By the time any tab is clicked the
-  // section is necessarily already in view, so this is already true and
-  // every subsequent switch animates immediately as before.
+  // Gates the panel text's per-element fade-in (see .panelReveal below) so
+  // the very first panel — mounted as part of the initial page render,
+  // usually well below the fold — doesn't play and finish its entrance
+  // off-screen before the user ever scrolls to it. By the time any tab is
+  // clicked the section is necessarily already in view, so this is already
+  // true, and every subsequent switch replays the animation immediately:
+  // `key={active}` fully remounts the panel's DOM nodes on every switch, and
+  // a CSS `animation` (unlike a `transition`) always plays on an element the
+  // moment it's inserted — no re-triggering logic needed. (The old approach
+  // relied on the sitewide `data-reveal`/useScrollReveal one-shot observer,
+  // which only ever wired up the very first panel's elements and silently
+  // never fired again on later tab switches.)
+  //
+  // Observes `revealAnchorRef` (the tab bar, right above the panel), NOT the
+  // whole `<section>` — the section also includes the heading and a
+  // 540px-tall image, so a 10%-of-the-whole-section threshold was
+  // satisfied while just the heading peeked into view, firing (and fully
+  // finishing, 500ms later) while the actual title/description were still
+  // hundreds of pixels below the fold. The tab bar sits immediately above
+  // the panel, so it becoming visible closely tracks the panel itself
+  // being about to enter view. A deep `-40%` bottom rootMargin (rather than
+  // a small threshold) requires the tab bar to reach well into the upper
+  // part of the viewport before firing, not just barely peek into the
+  // bottom edge — matches PlatformSurfacesStacked's own `hasEnteredView`.
+  const revealAnchorRef = useRef<HTMLDivElement>(null);
   const [hasEnteredView, setHasEnteredView] = useState(false);
   useEffect(() => {
-    const el = sectionRef.current;
+    const el = revealAnchorRef.current;
     if (!el) return;
     const observer = new IntersectionObserver(
       (entries) => {
@@ -116,7 +145,7 @@ export function PlatformSurfacesTabbed() {
         setHasEnteredView(true);
         observer.disconnect();
       },
-      { threshold: 0.1, rootMargin: "0px 0px -5% 0px" }
+      { threshold: 0, rootMargin: "0px 0px -40% 0px" }
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -151,15 +180,16 @@ export function PlatformSurfacesTabbed() {
       aria-labelledby="platform-surfaces-tabbed-heading"
     >
       <div className={styles.heading}>
-        <p className={styles.headingLine1} id="platform-surfaces-tabbed-heading" data-reveal>
-          {PLATFORM_SURFACES_HEADING.title}
-        </p>
-        <p className={styles.headingLine2} data-reveal>
-          {PLATFORM_SURFACES_HEADING.subtitle}
-        </p>
+        <AnimatedHeading
+          as="p"
+          text={PLATFORM_SURFACES_HEADING.title}
+          id="platform-surfaces-tabbed-heading"
+          className={styles.headingLine1}
+        />
+        <AnimatedHeading as="p" text={PLATFORM_SURFACES_HEADING.subtitle} className={styles.headingLine2} />
       </div>
 
-      <div className={styles.tabBarWrap}>
+      <div className={styles.tabBarWrap} ref={revealAnchorRef}>
         <div className={styles.tabBar} role="tablist" aria-label="Platform surfaces" onKeyDown={handleTabKeyDown}>
           {PLATFORM_SURFACE_CARDS.map((c, i) => {
             const isActive = i === active;
@@ -193,20 +223,30 @@ export function PlatformSurfacesTabbed() {
         id={`${baseId}-panel-${active}`}
         aria-labelledby={`${baseId}-tab-${active}`}
         tabIndex={0}
-        className={hasEnteredView ? `${styles.panelWrap} ${styles.panelWrapAnimated}` : styles.panelWrap}
+        className={styles.panelWrap}
       >
         <div className={styles.panel}>
           <div className={styles.panelText}>
             <div className={styles.panelTextTop}>
-              <h3 className={styles.panelTitle} data-reveal>
+              <h3
+                className={hasEnteredView ? `${styles.panelTitle} ${styles.panelReveal}` : styles.panelTitle}
+                style={hasEnteredView ? revealDelay(0) : undefined}
+              >
                 {card.title}
               </h3>
-              <p className={styles.panelDescription} data-reveal>
+              <p
+                className={hasEnteredView ? `${styles.panelDescription} ${styles.panelReveal}` : styles.panelDescription}
+                style={hasEnteredView ? revealDelay(1) : undefined}
+              >
                 {card.description}
               </p>
               <ul className={styles.panelFeatures}>
-                {card.features.map((feature) => (
-                  <li className={styles.panelFeature} data-reveal key={feature}>
+                {card.features.map((feature, i) => (
+                  <li
+                    className={hasEnteredView ? `${styles.panelFeature} ${styles.panelReveal}` : styles.panelFeature}
+                    style={hasEnteredView ? revealDelay(2 + i) : undefined}
+                    key={feature}
+                  >
                     <span className={styles.panelFeatureDot} aria-hidden="true" />
                     <p className={styles.panelFeatureText}>{feature}</p>
                   </li>
@@ -214,7 +254,11 @@ export function PlatformSurfacesTabbed() {
               </ul>
             </div>
 
-            <a className={styles.exploreLink} href="#">
+            <a
+              className={hasEnteredView ? `${styles.exploreLink} ${styles.panelReveal}` : styles.exploreLink}
+              style={hasEnteredView ? revealDelay(2 + card.features.length) : undefined}
+              href="#"
+            >
               Explore
               <ArrowRightIcon />
             </a>
