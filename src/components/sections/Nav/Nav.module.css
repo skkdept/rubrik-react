@@ -90,10 +90,18 @@
 
 /* The nav uses its own fixed 24px horizontal padding and 83px height at
    every breakpoint, per source — distinct from the 16/32/64px page margin
-   the rest of the page uses (Container), not a version of it. */
+   the rest of the page uses (Container), not a version of it.
+
+   justify-content is a no-op at >=1200px (searchGroup's own flex:1 already
+   consumes all free space between the two side groups there) but is load-
+   bearing below 1200px: searchGroup goes display:none at that width, so
+   without this, primaryGroup and secondaryGroup — the only two remaining
+   flex items — collapse together at the start edge instead of sitting at
+   opposite ends of the bar. */
 .bar {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--primitive-spacing-6);
   width: 100%;
   max-width: var(--semantic-layout-page-width);
