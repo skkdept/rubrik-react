@@ -360,8 +360,17 @@
    they're turned back off here rather than cutting across the new stacked
    layout. */
 @media (min-width: 768px) and (max-width: 1199px) {
+  /* `.card` itself stays locked to `.stackViewport`'s full 100svh (needed
+     for the scroll-jacked depth-stack effect), but stacking the image and
+     text in a column here makes the actual content much shorter than that
+     full height — without centering, the content sinks to the top and
+     leaves a large dead gap above the pinned `.controls` strip at the
+     bottom, stranding the nav arrows/dots far from the content they belong
+     to. Centering keeps the leftover space balanced instead of dumping all
+     of it below the content. */
   .card .cardBody {
     flex-direction: column;
+    justify-content: center;
   }
 
   .card .textPanel {
