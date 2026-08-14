@@ -107,6 +107,29 @@ td.muted {
   color: var(--semantic-color-fg-slate);
 }
 
+.edsYes,
+.edsNo {
+  font-family: var(--semantic-font-label);
+  font-weight: var(--primitive-font-weight-bold);
+}
+
+.edsYes {
+  color: var(--semantic-color-fg-brand);
+}
+
+.edsNo {
+  color: var(--semantic-color-fg-destructive);
+}
+
+.stepsList {
+  list-style: decimal;
+  margin: var(--primitive-spacing-3) 0 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitive-spacing-2);
+}
+
 code {
   font-family: var(--primitive-font-family-mono);
   font-size: 0.85em;
