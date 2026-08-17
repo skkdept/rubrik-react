@@ -40,6 +40,10 @@
 .bodyWrap {
   position: relative;
   flex-shrink: 0;
+  /* Smaller padding than the desktop box below, just enough room for the
+     smaller corner marks so they do not sit on top of the body text. */
+  padding: var(--primitive-spacing-3) var(--primitive-spacing-4); /* 12px 16px */
+  box-sizing: border-box;
 }
 
 .body {
@@ -51,10 +55,9 @@
 
 .plusMark {
   position: absolute;
-  width: 12px;
-  height: 12px;
+  width: 8px;
+  height: 8px;
   fill: var(--semantic-color-fg-primary);
-  display: none;
 }
 
 @media (min-width: 1200px) {
@@ -87,6 +90,7 @@
   }
 
   .plusMark {
-    display: block;
+    width: 12px;
+    height: 12px;
   }
 }
