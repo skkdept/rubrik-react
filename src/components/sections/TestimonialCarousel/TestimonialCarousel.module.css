@@ -5,7 +5,25 @@
 }
 
 /* ── Mobile: one card per swipeable slide (native scroll-snap, not
-   hand-rolled touch handling) plus dot pagination below ── */
+   hand-rolled touch handling) plus dot pagination below ──
+   `contain: layout` is load-bearing, not a performance nicety: with 4
+   cards laid out side by side (each `flex: 0 0 100%`), this row is
+   genuinely 4x the viewport wide internally, `overflow-x: auto`
+   correctly contains it for real rendering and touch scrolling (no
+   visible scrollbar, no hit-testable content past 100% width, confirmed
+   via elementFromPoint) — but Chromium and WebKit's own "ideal viewport"
+   sizing heuristic for mobile pages reads straight past overflow-x:
+   auto/hidden/clip on this element AND on html/body (confirmed by testing
+   each directly) when deciding whether the page needs to be zoomed out.
+   That heuristic still counts this row's full unclipped content width,
+   inflating `window.innerWidth`/`document.documentElement.scrollWidth`
+   site-wide and making the whole page render zoomed out with dead space
+   on one side — exactly the "renders fine, breaks on zoom" bug reported
+   against this component. `contain: layout` gives the browser a
+   structural guarantee (not just a paint-time clip) that this element's
+   internal layout can never affect anything outside it, which the
+   heuristic does respect. Confirmed fixed in both Chromium and WebKit
+   mobile emulation; native swipe/scroll-snap behavior unaffected. */
 .mobileList {
   display: flex;
   flex-direction: row;
@@ -13,6 +31,7 @@
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  contain: layout;
 }
 
 .mobileList::-webkit-scrollbar {
